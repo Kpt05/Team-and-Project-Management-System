@@ -94,7 +94,6 @@
 </head>
 
 <body>
-
     <div id="main-wrapper">
         <video id="myVideo" poster="images/bg.png" autoplay muted loop>
             <source src="images/bg.mp4" type="video/mp4">
