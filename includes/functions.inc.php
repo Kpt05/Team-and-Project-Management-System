@@ -95,36 +95,96 @@ function emptyInputLogin($email, $password)
 }
 
 
+
+
 //Function to login a user
 function loginUser($conn, $email, $password)
 {
+    // Check if the email exists in the database
     $emailExists = emailExists($conn, $email);
+
     if ($emailExists === false) {
         header("Location: ../index.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
         exit();
     }
 
+    // Get the hashed password from the database and verify the password entered by the user
     $passwordHashed = $emailExists["password"];
     $checkPassword = password_verify($password, $passwordHashed);
 
     if ($checkPassword === false) {
-        header("Location: ../index.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
-    } else if ($checkPassword === true) {
+        // Password is incorrect, increase the failed attempts count and check if the account needs to be locked
+        $failed_attempts = $emailExists["failed_attempts"] + 1;
+        $last_failed_attempt_time = $emailExists["last_failed_attempt_time"];
 
+        // Check if the user account needs to be locked
+        if ($failed_attempts >= 3) {
+            $current_time = time();
+            $time_diff = $current_time - $last_failed_attempt_time;
+
+            if ($time_diff < 180) {
+                // Account is locked, redirect the user to the login page with an error message
+                header("Location: ../index.php?error=accountlocked&message=" . urlencode("Your account has been locked for 3 minutes due to multiple failed login attempts."));
+                exit();
+            } else {
+                // Account is no longer locked, reset the failed attempts count
+                $failed_attempts = 1;
+                $last_failed_attempt_time = $current_time;
+            }
+        }
+
+        // Update the failed attempts count and last failed attempt time in the database
+        $sql = "UPDATE Users SET failed_attempts = ?, last_failed_attempt_time = ? WHERE email = ?";
+        $stmt = mysqli_stmt_init($conn);
+
+        if (!mysqli_stmt_prepare($stmt, $sql)) {
+            header("Location: ../index.php?error=sqlerror&message=" . urlencode("An error has occurred."));
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt, "iss", $failed_attempts, $last_failed_attempt_time, $email);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+
+        // Password is incorrect, redirect the user to the login page with an error message
+        header("Location: ../index.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
+        exit();
+    } else {
+        // Password is correct, reset failed attempts count and update last_login_time
+        $failed_attempts = 0;
+        $last_login_time = time();
+        $sql = "UPDATE Users SET failed_attempts = ?, last_failed_attempt_time = NULL, last_login_time = ? WHERE email = ?";
+        $stmt = mysqli_stmt_init($conn);
+
+        if (!mysqli_stmt_prepare($stmt, $sql)) {
+            header("Location: ../index.php?error=sqlerror&message=" . urlencode("An error has occurred."));
+            exit();
+        }
+
+        mysqli_stmt_bind_param($stmt, "iss", $failed_attempts, $last_login_time, $email);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+
+        // Start the user session and redirect the user to the dashboard
         session_start();
         $_SESSION["empNo"] = $emailExists["empNo"];
         $_SESSION["email"] = $emailExists["email"];
         $_SESSION["accountType"] = $emailExists["accountType"];
-        if ($_SESSION["accountType"] == "Employee") {
-            header("Location: ../Dashboard.php");
-        } else if ($_SESSION["accountType"] == "Manager") {
-            header("Location: ../Dashboard.php");
-        } else {
-            header("Location: ../Dashboard.php");
-        }
+
+        header("Location: ../Dashboard.php");
         exit();
     }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 // Function to create a new User

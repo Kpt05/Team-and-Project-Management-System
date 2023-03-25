@@ -96,7 +96,7 @@
 <body>
     <div id="main-wrapper">
         <video id="myVideo" poster="images/bg.png" autoplay muted loop>
-            <source src="images/bg.mp4" type="video/mp4">
+            <source src="images/bgVid.mp4" type="video/mp4">
         </video>
 
         <section class="ftco-section">
@@ -126,7 +126,12 @@
 
                                     <div class="form-group mb-3">
                                         <label class="label" for="Password">Password</label>
-                                        <input type="password" class="form-control" placeholder="Password" required name="password" id="password" />
+                                        <div class="position-relative">
+                                            <input type="password" class="form-control pr-5" placeholder="Password" required name="password" id="password" />
+                                            <span class="position-absolute top-50 translate-middle-y" style="right: 15px; top: 10px;" id="password-toggle">
+                                                <i class="fa fa-eye"></i>
+                                            </span>
+                                        </div>
                                     </div>
 
                                     <div class="form-group">
@@ -160,7 +165,22 @@
                                     }
                                     ?> -->
 
+                                    <script>
+                                        var passwordToggle = document.getElementById("password-toggle");
+                                        var passwordField = document.getElementById("password");
+                                        passwordToggle.addEventListener("click", function() {
+                                            if (passwordField.type === "password") {
+                                                passwordField.type = "text";
+                                                passwordToggle.innerHTML = '<i class="fa fa-eye-slash"></i>';
+                                            } else {
+                                                passwordField.type = "password";
+                                                passwordToggle.innerHTML = '<i class="fa fa-eye"></i>';
+                                            }
+                                        });
+                                    </script>
+
                                 </form>
+
 
                                 <style>
                                     .error-message {

@@ -127,7 +127,6 @@ $result = mysqli_query($conn, $sql);
                     <div class="row">
                         <div class="col-md-8">
                             <h2 class="font-weight-bold">View Teams</h2>
-
                         </div>
                         <div class="col-md-4 text-md-right">
                             <a href="createSystemUser.php" class="btn btn-link text-decoration-none text-reset" id="add-user">

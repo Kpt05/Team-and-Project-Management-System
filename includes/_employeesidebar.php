@@ -68,42 +68,17 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
-                <i class="icon-clock menu-icon"></i>
+            <a class="nav-link" href="../clockings/clockings.php">
+                <i class="icon-grid menu-icon"></i>
                 <span class="menu-title">Clockings</span>
-                <i class="menu-arrow"></i>
             </a>
-            <div class="collapse" id="form-elements">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../system_users/administrators.php">
-                            Clock-In
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../system_users/managers.php">
-                            Clock-Out
-                        </a>
-                    </li>
-                </ul>
-            </div>
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
+            <a class="nav-link" href="../reports/personal_report.php">
                 <i class="icon-bar-graph-2 menu-icon"></i>
-                <span class="menu-title">Reports</span>
-                <i class="menu-arrow"></i>
+                <span class="menu-title">Personal Report</span>
             </a>
-            <div class="collapse" id="auth">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../reports/project_reports.php">
-                            Personal Reports
-                        </a>
-                    </li>
-                </ul>
-            </div>
         </li>
 
 

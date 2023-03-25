@@ -235,22 +235,22 @@ $result = mysqli_query($conn, $sql);
                                         editBtn.addEventListener('click', () => {
                                             const selectedRows = document.querySelectorAll('#data-table-basic tbody tr.selected');
                                             if (selectedRows.length === 1) {
-
-                                                const firstName = selectedRows[0].childNodes[1].innerHTML;
-                                                const middleName = selectedRows[0].childNodes[1].innerHTML;
-                                                const lastName = selectedRows[0].childNodes[2].innerHTML;
+                                                const fullName = selectedRows[0].childNodes[1].innerHTML;
+                                                const nameParts = fullName.split(' ');
+                                                const firstName = nameParts[0];
+                                                const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
                                                 const gender = selectedRows[0].childNodes[3].innerHTML;
                                                 const DOB = selectedRows[0].childNodes[3].innerHTML;
-                                                const phoneNumber = selectedRows[0].childNodes[3].innerHTML;
-                                                const address = selectedRows[0].childNodes[3].innerHTML;
+                                                const phoneNumber = selectedRows[0].childNodes[7].innerHTML;
+                                                const address = selectedRows[0].childNodes[8].innerHTML;
 
                                                 const accountType = selectedRows[0].childNodes[0].innerHTML;
                                                 const empNo = selectedRows[0].childNodes[0].innerHTML;
-                                                const teams = selectedRows[0].childNodes[0].innerHTML;
-                                                // const email = selectedRows[0].childNodes[4].innerHTML;
+                                                const teams = selectedRows[0].childNodes[4].innerHTML;
+                                                const email = selectedRows[0].childNodes[3].innerHTML;
 
                                                 document.getElementById('edit-user-firstName').value = firstName;
-                                                document.getElementById('edit-user-middleName').value = middleName;
+                                                document.getElementById('edit-user-middleName').value = '';
                                                 document.getElementById('edit-user-lastName').value = lastName;
                                                 document.getElementById('edit-user-gender').value = gender;
                                                 document.getElementById('edit-user-DOB').value = DOB;
@@ -260,7 +260,7 @@ $result = mysqli_query($conn, $sql);
                                                 document.getElementById('edit-user-accountType').value = accountType;
                                                 document.getElementById('edit-user-empNo').value = empNo;
                                                 document.getElementById('edit-user-teams').value = teams;
-                                                // document.getElementById('edit-user-email').value = email;
+                                                document.getElementById('edit-user-email').value = email;
 
                                                 const modal = new bootstrap.Modal(document.getElementById('edit-user-modal'), {
                                                     keyboard: false
