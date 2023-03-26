@@ -150,26 +150,27 @@
                                         </div>
                                     </div>
 
-
-                                    <!-- Error message
                                     <?php
-                                    //Empty input
-                                    if (isset($_GET['error']) && $_GET['error'] === "emptyinput") {
-                                        $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                        echo "<div class='error-message'>" . htmlspecialchars($message) . "</div>";
+                                    if (isset($_GET["error"])) {
+                                        $message = "";
+                                        switch ($_GET["error"]) {
+                                            case "emptyinput":
+                                                $message = "Please fill in all fields.";
+                                                break;
+                                            case "incorrectdetails":
+                                                $message = "Incorrect details.";
+                                                break;
+                                            case "failedattempts":
+                                                $message = "Too many failed attempts. Please try again later.";
+                                                break;
+                                            default:
+                                                $message = "An error has occurred.";
+                                                break;
+                                        }
+
+                                        echo "<div class='error-message'>" . $message . "</div>";
                                     }
-
-                                    //Incorrect details
-                                    if (isset($_GET['error']) && $_GET['error'] === "incorrectdetails") {
-                                        $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                        echo "<div class='error-message'>" . htmlspecialchars($message) . "</div>";
-                                    }
-                                    ?> -->
-
-
-
-
-
+                                    ?>
 
                                     <script>
                                         var passwordToggle = document.getElementById("password-toggle");

@@ -2,26 +2,24 @@
 // Path: includes\login.inc.php
 
 require('functions.inc.php');
+require('authentication.inc.php');
 
-//Variables
+// Variables
 $email = $_POST['email'];
 $password = $_POST['password'];
 
 if (isset($_POST["submit"])) {
-
     $conn = require __DIR__ . '/dbconfig.php';
 
-    //Function call to check for empty fields
-
+    // Function call to check for empty fields
     if (emptyInputLogin($email, $password) !== false) {
-        header("Location: ../index.php?error=emptyinput&message=" . urlencode("Please fill all fields"));
+        header("Location: ../index.php?error=emptyinput");
         exit();
     }
 
-    //Function call to login user
-
-    loginUser($conn, $email, $password);
-} else {
-    header("Location: ../index.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
-    exit();
+    // Function call to login user
+    if (login($conn, $email, $password)) {
+        header("Location: ../Dashboard.php");
+        exit();
+    }
 }
