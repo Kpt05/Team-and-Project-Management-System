@@ -97,6 +97,12 @@ function emptyInputLogin($email, $password)
 
 
 
+
+
+
+
+
+
 //Function to login a user
 function loginUser($conn, $email, $password)
 {
@@ -124,8 +130,8 @@ function loginUser($conn, $email, $password)
 
             if ($time_diff < 180) {
                 // Account is locked, redirect the user to the login page with an error message
-                header("Location: ../index.php?error=accountlocked&message=" . urlencode("Your account has been locked for 3 minutes due to multiple failed login attempts."));
-                exit();
+                header("Location: ../index.php?error=incorrectdetails&failed_attempts=" . $failed_attempts . "&message=" . urlencode("Incorrect email or password"));
+
             } else {
                 // Account is no longer locked, reset the failed attempts count
                 $failed_attempts = 1;
@@ -161,7 +167,7 @@ function loginUser($conn, $email, $password)
             exit();
         }
 
-        mysqli_stmt_bind_param($stmt, "iss", $failed_attempts, $last_login_time, $email);
+        mysqli_stmt_bind_param($stmt, "isi", $failed_attempts, $last_login_time, $email);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
 
@@ -175,6 +181,13 @@ function loginUser($conn, $email, $password)
         exit();
     }
 }
+
+
+
+
+
+
+
 
 
 

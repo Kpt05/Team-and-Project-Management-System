@@ -150,6 +150,7 @@
                                         </div>
                                     </div>
 
+
                                     <!-- Error message
                                     <?php
                                     //Empty input
@@ -164,6 +165,11 @@
                                         echo "<div class='error-message'>" . htmlspecialchars($message) . "</div>";
                                     }
                                     ?> -->
+
+
+
+
+
 
                                     <script>
                                         var passwordToggle = document.getElementById("password-toggle");
