@@ -96,114 +96,6 @@ function emptyInputLogin($email, $password)
 
 
 
-
-
-// //Function to login a user
-// function loginUser($conn, $email, $password)
-// {
-//     // Check if the email exists in the database
-//     $emailExists = emailExists($conn, $email);
-
-//     if ($emailExists === false) {
-//         header("Location: ../index.php?error=incorrectdetails&message=" . urlencode("Incorrect email or password"));
-//         exit();
-//     } else {
-//         // Get the hashed password from the database and verify the password entered by the user
-//         $passwordHashed = $emailExists["password"];
-//         $checkPassword = password_verify($password, $passwordHashed);
-
-//         if ($checkPassword === false) {
-//             // Password is incorrect, increase the failed attempts count and check if the account needs to be locked
-//             $failed_attempts = $emailExists["failed_attempts"] + 1;
-//             echo $failed_attempts;
-//             $last_failed_attempt_time = $emailExists["last_failed_attempt_time"];
-
-//             // Check if the user account needs to be locked
-//             if ($failed_attempts >= 3) {
-
-//                 $current_time = new DateTime();
-
-//                 $current_time_str = $current_time->format('Y-m-d H:i:s');
-
-//                 //Create a DateTime object from the string value using createFromFormat
-//                 $date = DateTime::createFromFormat('Y-m-d H:i:s', $last_failed_attempt_time);
-
-//                 //Calculate the diffrence in seconds between the current time and the last failed attempt time
-//                 $time_diff = $current_time->getTimestamp() - $date->getTimestamp();
-
-//                 //Checking to see if the difference in time for when the user last attempted to log in is greater than 3 minutes (in seconds)
-//                 if ($time_diff > 180) {
-//                     //  Account is locked, redirect the user to the login page with an error message
-//                     header("Location: ../index.php?error=incorrectdetails&failed_attempts=" . $time_diff . "&message=" . urlencode("Too quick test"));
-//                 } else {
-//                     // Account is no longer locked, reset the failed attempts count
-//                     $failed_attempts = 1;
-//                     //$last_failed_attempt_time = $current_time_str;
-//                 }
-//             }
-
-//             // Update the failed attempts count and last failed attempt time in the database
-//             $sql = "UPDATE Users SET failed_attempts = ?, last_failed_attempt_time = ? WHERE email = ?";
-//             $stmt = mysqli_stmt_init($conn);
-
-//             if (!mysqli_stmt_prepare($stmt, $sql)) {
-//                 header("Location: ../index.php?error=sqlerror&message=" . urlencode("An error has occurred."));
-//                 exit();
-//             }
-
-//             mysqli_stmt_bind_param($stmt, "iss", $failed_attempts, $last_failed_attempt_time, $email);
-//             mysqli_stmt_execute($stmt);
-//             mysqli_stmt_close($stmt);
-
-//             // Password is incorrect, redirect the user to the login page with an error message
-//             header("Location: ../index.php?error=incorrectdetails&failed_attempts=" . $time_diff . "&message=" . urlencode("Incorrect email or password"));
-//             exit();
-//         }
-
-//         // Password is correct, reset failed attempts count and update last_login_time
-//         $failed_attempts = 0;
-//         $last_login_time = time();
-//         $sql = "UPDATE Users SET failed_attempts = ?, last_failed_attempt_time = NULL, last_login_time = ? WHERE email = ?";
-//         $stmt = mysqli_stmt_init($conn);
-
-//         if (!mysqli_stmt_prepare($stmt, $sql)) {
-//             header("Location: ../index.php?error=sqlerror&message=" . urlencode("An error has occurred."));
-//             exit();
-//         }
-
-//         mysqli_stmt_bind_param($stmt, "iss", $failed_attempts, $last_login_time, $email);
-//         mysqli_stmt_execute($stmt);
-//         mysqli_stmt_close($stmt);
-
-//         // Start the user session and redirect the user to the dashboard
-//         session_start();
-//         $_SESSION["empNo"] = $emailExists["empNo"];
-//         $_SESSION["email"] = $emailExists["email"];
-//         $_SESSION["accountType"] = $emailExists["accountType"];
-
-//         header("Location: ../Dashboard.php");
-//         exit();
-//     }
-// }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Function to create a new User
 function createUser($conn, $firstName, $middleName, $lastName, $gender, $DOB, $phoneNumber, $address, $accountType, $empNo, $teams, $email, $password)
 {
@@ -293,6 +185,7 @@ function getLastName($conn, $empNo)
     }
 }
 
+
 function getAccountType($conn, $empNo)
 {
     $sql = "SELECT accountType FROM Users WHERE empNo = ?;";
@@ -314,6 +207,7 @@ function getAccountType($conn, $empNo)
         return $result;
     }
 }
+
 
 function deleteUser($conn, $empNo)
 {
