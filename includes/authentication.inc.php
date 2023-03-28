@@ -32,7 +32,8 @@ function authenticate($conn)
 
         // Check if the user has exceeded the maximum number of failed attempts.
         if ($user->failed_attempts >= 3) {
-            // Check if the last failed attempt was made within the last 5 minutes.
+
+            // Check if the last failed attempt was made within the last 3 minutes.
             $last_failed_attempt_time = strtotime($user->last_failed_attempt_time);
             $current_time = time();
             $time_difference = $current_time - $last_failed_attempt_time;
@@ -98,7 +99,6 @@ function getUser($conn, $email)
 function login($conn, $email, $password)
 {
     $user = getUser($conn, $email);
-
     if ($user == null) {
         // The user is not logged in.
         return false;
@@ -106,11 +106,11 @@ function login($conn, $email, $password)
         // The user is logged in but we need to check the authentication status.
 
         // Check if the user has exceeded the maximum number of failed attempts.
-        if ($user->failed_attempts >= 3) {
-            // Check if the last failed attempt was made within the last 5 minutes.
-            $last_failed_attempt_time = strtotime($user->last_failed_attempt_time);
-            $current_time = time();
-            $time_difference = $current_time - $last_failed_attempt_time;
+        if ($user->failed_attempts >= 2) {
+            // Check if the last failed attempt was made within the last 3 minutes.
+            $last_failed_attempt_time = new DateTime($user->last_failed_attempt_time);
+            $current_time = new DateTime();
+            $time_difference = $current_time->getTimestamp() - $last_failed_attempt_time->getTimestamp();
             if ($time_difference < 180) {
                 // The user has exceeded the maximum number of failed attempts.
                 // Re-direct to the error page.
@@ -138,16 +138,19 @@ function login($conn, $email, $password)
         if ($password_check == false) {
             // The password is incorrect.
             // Increment the failed attempts counter.
-            $sql = "UPDATE users SET failed_attempts = failed_attempts + 1, last_failed_attempt_time = CURRENT_TIMESTAMP WHERE email = ?";
+            $last_failed_attempt_time = date('Y-m-d H:i:s');
+            //Updating the failed attempt record so that when the user tries to log in again, they will be blocked if the value is large enough.
+            $sql = "UPDATE users SET failed_attempts = failed_attempts + 1, last_failed_attempt_time = ? WHERE email = ?";
             $stmt = mysqli_stmt_init($conn);
             if (!mysqli_stmt_prepare($stmt, $sql)) {
                 // Re-direct to the error page.
                 header("Location: ../index.php?error=sqlerror");
                 // There is an error in the SQL statement or the database connection.
             } else {
-                mysqli_stmt_bind_param($stmt, "s", $user->email);
+                mysqli_stmt_bind_param($stmt, "ss", $last_failed_attempt_time, $user->email);
                 mysqli_stmt_execute($stmt);
             }
+
             header("Location: ../index.php?error=incorrectdetails");
             return false;
         } else if ($password_check == true) {

@@ -208,7 +208,6 @@ function getAccountType($conn, $empNo)
     }
 }
 
-
 function deleteUser($conn, $empNo)
 {
     $conn->begin_transaction();
