@@ -11,7 +11,29 @@ $firstName = getFirstName($conn, $empNo);
 $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
 
+// Count number of admins
+$sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Administrator'";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+$admin_count = $row['count'];
+
+// Count number of managers
+$sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Manager'";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+$manager_count = $row['count'];
+
+// Count number of employees
+$sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Employee'";
+$result = $conn->query($sql);
+$row = $result->fetch_assoc();
+$employee_count = $row['count'];
+
+$total_users = $admin_count + $manager_count + $employee_count;
+
 ?>
+
+
 
 <!--Created by Kevin Titus on 2022-07-19.-->
 <!DOCTYPE html>
@@ -27,6 +49,8 @@ $accountType = getAccountType($conn, $empNo);
     <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 
     <!-- endinject -->
     <!-- Plugin css for this page -->
@@ -152,28 +176,79 @@ $accountType = getAccountType($conn, $empNo);
                                 .catch(error => console.log(error));
                         </script>
 
+<div class="col-md-6 grid-margin stretch-card">
+  <div class="card position-relative">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <canvas id="myPieChart"></canvas>
+        </div>
+        <div class="col-md-6">
+          <div class="chart-legend">
+            <h4 style="font-size: 24px; margin-bottom: 30px;">Active User Accounts</h4>
+            <p style="font-size: 20px; margin-bottom: 35px;">Admins: <?php echo $admin_count; ?></p>
+            <p style="font-size: 20px; margin-bottom: 35px;">Managers: <?php echo $manager_count; ?></p>
+            <p style="font-size: 20px; margin-bottom: 45px;">Employees: <?php echo $employee_count; ?></p>
+            <p style="font-size: 20px; margin-bottom: 0;">Total Users: <?php echo $total_users; ?></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-                        <div class="col-md-6 grid-margin stretch-card">
-                            <div class="card position-relative">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-12 col-xl-6 d-flex flex-column justify-content-start">
-                                            <div class="ml-xl-4 mt-3">
-                                                <p class="card-title">Detailed Reports</p>
-                                                <h1 class="text-primary">$34040</h1>
-                                                <h3 class="font-weight-500 mb-xl-4 text-primary">
-                                                    North America
-                                                </h3>
-                                                <p class="mb-2 mb-xl-0">
-                                                    The total number of sessions within the date range. It is the period time a user is actively engaged with your website, page or app, etc
-                                                </p>
-                                            </div>
-                                        </div>
+<script>
+var ctx = document.getElementById('myPieChart').getContext('2d');
+var myPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['Admins', 'Managers', 'Employees'],
+        datasets: [{
+            data: [<?php echo $admin_count; ?>, <?php echo $manager_count; ?>, <?php echo $employee_count; ?>],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.7)',
+                'rgba(54, 162, 235, 0.7)',
+                'rgba(255, 206, 86, 0.7)'
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)'
+            ],
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        legend: {
+            position: 'right',
+            align: 'end',
+            labels: {
+                fontColor: 'black'
+            }
+        },
+        tooltips: {
+            callbacks: {
+                label: function(tooltipItem, data) {
+                    var dataset = data.datasets[tooltipItem.datasetIndex];
+                    var label = data.labels[tooltipItem.index];
+                    var value = dataset.data[tooltipItem.index];
+                    var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
+                        return previousValue + currentValue;
+                    });
+                    var percentage = Math.round(value / total * 100);
+                    return label + ': ' + percentage + '%';
+                }
+            }
+        }
+    }
+});
+</script>
 
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+
+
+
 
 
                     </div>

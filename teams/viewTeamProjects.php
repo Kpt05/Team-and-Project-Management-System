@@ -63,20 +63,27 @@
 
     <div class="container-scroller">
 
-        <!-- partial:includes/_navbar.php -->
-        <?php include "../includes/_navbar.php"; ?>
+          <!-- partial:includes/_navbar.php -->
+          <?php include "includes/_navbar.php"; ?>
 
 
-        <div class="container-fluid page-body-wrapper">
+<div class="container-fluid page-body-wrapper">
 
-            <!-- partial:includes/_settings-panel.html -->
-            <?php include "../includes/_settings-panel.php"; ?>
+    <!-- partial:includes/_settings-panel.html -->
+    <?php include "includes/_settings-panel.php"; ?>
 
-            <!-- partial:includes/_adminsidebar.php -->
-            <?php include '../includes/_adminsidebar.php'; ?>
+    <!-- partial - Account Type Based Navbar -->
+    <?php
+    if ($accountType == 'Employee') {
+        include 'includes/_employeesidebar.php';
+    } elseif ($accountType == 'Manager') {
+        include 'includes/_managersidebar.php';
+    } elseif ($accountType == 'Administrator') {
+        include 'includes/_adminsidebar.php';
+    }
+    ?>
 
-
-            <!-- partial -->
+    <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="row">
