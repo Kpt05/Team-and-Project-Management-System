@@ -181,9 +181,6 @@ $accountType = getAccountType($conn, $empNo);
 
                     <div class="row">
 
-
-
-
                         <div class="row">
                             <div class="col-md-5 grid-margin stretch-card">
 
