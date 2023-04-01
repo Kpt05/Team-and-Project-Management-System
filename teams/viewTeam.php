@@ -25,6 +25,8 @@ $sql = "SELECT * FROM Users";
 // Execute the query and get the result set
 $result = mysqli_query($conn, $sql);
 
+$sql = "SELECT * FROM Teams";
+$result = mysqli_query($conn, $sql);
 
 ?>
 
@@ -99,6 +101,92 @@ $result = mysqli_query($conn, $sql);
             visibility: hidden;
         }
     }
+
+    .team-card {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px;
+        display: inline-block;
+        width: 265px;
+        box-sizing: border-box;
+        vertical-align: top;
+        position: relative;
+        border-radius: 10px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .team-card:hover {
+        box-shadow: 0 0 5px #ddd;
+    }
+
+    .team-card .team-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+        background-color: #ddd;
+        background-size: cover;
+        background-position: center;
+        display: inline-block;
+        border: 5px solid white;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .team-card .team-name {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #375577;
+        text-shadow: 1px 1px #ddd;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .team-card .team-info {
+        font-size: 14px;
+        margin-bottom: 5px;
+        color: black;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .create-team-card {
+        border: 1px dashed #ddd;
+        padding: 10px;
+        margin: 10px;
+        display: inline-block;
+        width: 265px;
+        height: 220px;
+        box-sizing: border-box;
+        vertical-align: top;
+        position: relative;
+        cursor: pointer;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .create-team-card:hover {
+        border-color: #999;
+    }
+
+    .create-team-card .create-team-icon {
+        font-size: 48px;
+        color: #ddd;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+
+    .team-card.selected {
+    border: 2px solid #375577;
+  }
 </style>
 
 <body>
@@ -129,8 +217,8 @@ $result = mysqli_query($conn, $sql);
                             <h2 class="font-weight-bold">View Teams</h2>
                         </div>
                         <div class="col-md-4 text-md-right">
-                            <a href="createSystemUser.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
-                                <i class="bi bi-person-plus" style="font-size: 1.5rem; color: #375577;"></i>
+                            <a href="createTeam.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
+                                <i class="bi bi-plus" style="font-size: 1.5rem; color: #375577;"></i>
                             </a>
                             <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-user" style="opacity: 0.5; pointer-events: none;">
                                 <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
@@ -145,155 +233,24 @@ $result = mysqli_query($conn, $sql);
                         <div class="col-lg-12 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <div class="table-responsive mt-3">
-                                        <table id="data-table-basic" class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Employee No.</th>
-                                                    <th>Name</th>
-                                                    <th>Role</th>
-                                                    <th>Email</th>
-                                                    <th>Team</th>
-                                                    <th>Gender</th>
-                                                    <th>DOB</th>
-                                                    <th>Phone</th>
-                                                    <th>Address</th>
-                                                    <th>Report</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                // Loop through each row in the result set and output the data
-                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                    echo "<tr onclick=\"highlightRow(this)\">";
-                                                    echo "<td>" . $row['empNo'] . "</td>";
-                                                    echo "<td>" . $row['firstName'] . " " . $row['lastName'] . "</td>";
-                                                    echo "<td>" . $row['accountType'] . "</td>";
-                                                    echo "<td>" . $row['email'] . "</td>";
-                                                    echo "<td>" . $row['teams'] . "</td>";
-                                                    echo "<td>" . $row['gender'] . "</td>";
-                                                    echo "<td>" . $row['DOB'] . "</td>";
-                                                    echo "<td>" . $row['phone'] . "</td>";
-                                                    echo "<td>" . $row['address'] . "</td>";
-                                                    echo "<td>" . $row['Report'] . "</td>";
-                                                    echo "</tr>";
-                                                }
-                                                ?>
-                                            </tbody>
-                                        </table>
+
+                                    <?php
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        echo '<div class="team-card">';
+                                        echo '<div class="team-pic" style="background-image: url(' . $row["team_pic"] . ');"></div>';
+                                        echo '<div class="team-name">' . $row["teamName"] . '</div>';
+                                        echo '<div class="team-info">Team ID: ' . $row["teamID"] . '</div>';
+                                        echo '<div class="team-info">Department: ' . $row["department"] . '</div>';
+                                        echo '<div class="team-info">Team Lead: ' . $row["teamLead"] . '</div>';
+                                        echo '<div class="team-info">Contact Email: ' . $row["teamID"] . '</div>';
+                                        echo '</div>';
+                                    }
+                                    ?>
+                                    <div class="create-team-card" onclick="location.href='createTeam.php';">
+                                        <div class="create-team-icon">+</div>
                                     </div>
 
-                                    <script>
-                                        const addBtn = document.getElementById('add-user');
-                                        const editBtn = document.getElementById('edit-user');
-                                        const deleteBtn = document.getElementById('delete-user');
-                                        const tableRows = document.querySelectorAll('#data-table-basic tbody tr');
-
-                                        tableRows.forEach(row => {
-                                            row.addEventListener('click', () => {
-                                                // Highlight the clicked row
-                                                tableRows.forEach(row => {
-                                                    row.classList.remove('selected');
-                                                });
-                                                row.classList.add('selected');
-
-                                                // Enable/disable the edit and delete buttons
-                                                const selectedRows = document.querySelectorAll('#data-table-basic tbody tr.selected');
-                                                if (selectedRows.length === 1) {
-                                                    editBtn.style.opacity = '1';
-                                                    editBtn.style.pointerEvents = 'auto';
-                                                    deleteBtn.style.opacity = '1';
-                                                    deleteBtn.style.pointerEvents = 'auto';
-                                                } else {
-                                                    editBtn.style.opacity = '0.5';
-                                                    editBtn.style.pointerEvents = 'none';
-                                                    deleteBtn.style.opacity = '0.5';
-                                                    deleteBtn.style.pointerEvents = 'none';
-                                                }
-                                            });
-                                        });
-
-                                        // Unselect the data row when clicking outside the table
-                                        document.addEventListener('click', (event) => {
-                                            const isClickInsideTable = event.target.closest('#data-table-basic tbody');
-                                            if (!isClickInsideTable) {
-                                                tableRows.forEach(row => {
-                                                    row.classList.remove('selected');
-                                                });
-                                                editBtn.style.opacity = '0.5';
-                                                editBtn.style.pointerEvents = 'none';
-                                                deleteBtn.style.opacity = '0.5';
-                                                deleteBtn.style.pointerEvents = 'none';
-                                            }
-                                        });
-
-                                        // Open the edit user modal form when the edit button is clicked
-                                        editBtn.addEventListener('click', () => {
-                                            const selectedRows = document.querySelectorAll('#data-table-basic tbody tr.selected');
-                                            if (selectedRows.length === 1) {
-
-                                                const firstName = selectedRows[0].childNodes[1].innerHTML;
-                                                const middleName = selectedRows[0].childNodes[1].innerHTML;
-                                                const lastName = selectedRows[0].childNodes[2].innerHTML;
-                                                const gender = selectedRows[0].childNodes[3].innerHTML;
-                                                const DOB = selectedRows[0].childNodes[3].innerHTML;
-                                                const phoneNumber = selectedRows[0].childNodes[3].innerHTML;
-                                                const address = selectedRows[0].childNodes[3].innerHTML;
-
-                                                const accountType = selectedRows[0].childNodes[0].innerHTML;
-                                                const empNo = selectedRows[0].childNodes[0].innerHTML;
-                                                const teams = selectedRows[0].childNodes[0].innerHTML;
-                                                // const email = selectedRows[0].childNodes[4].innerHTML;
-
-                                                document.getElementById('edit-user-firstName').value = firstName;
-                                                document.getElementById('edit-user-middleName').value = middleName;
-                                                document.getElementById('edit-user-lastName').value = lastName;
-                                                document.getElementById('edit-user-gender').value = gender;
-                                                document.getElementById('edit-user-DOB').value = DOB;
-                                                document.getElementById('edit-user-phoneNumber').value = phoneNumber;
-                                                document.getElementById('edit-user-address').value = address;
-
-                                                document.getElementById('edit-user-accountType').value = accountType;
-                                                document.getElementById('edit-user-empNo').value = empNo;
-                                                document.getElementById('edit-user-teams').value = teams;
-                                                // document.getElementById('edit-user-email').value = email;
-
-                                                const modal = new bootstrap.Modal(document.getElementById('edit-user-modal'), {
-                                                    keyboard: false
-                                                });
-                                                modal.show();
-                                            }
-                                        });
-
-                                        deleteBtn.addEventListener('click', () => {
-                                            const selectedRows = document.querySelectorAll('#data-table-basic tbody tr.selected');
-                                            if (selectedRows.length === 1) {
-                                                const empNo = selectedRows[0].childNodes[0].innerHTML;
-                                                if (confirm(`Are you sure you want to delete user with employee number ${empNo}?`)) {
-                                                    const form = document.createElement('form');
-                                                    form.action = '';
-                                                    form.method = 'post';
-
-                                                    const empNoField = document.createElement('input');
-                                                    empNoField.type = 'hidden';
-                                                    empNoField.name = 'empNo';
-                                                    empNoField.value = empNo;
-
-                                                    const deleteField = document.createElement('input');
-                                                    deleteField.type = 'hidden';
-                                                    deleteField.name = 'delete';
-                                                    deleteField.value = 'true';
-
-                                                    form.appendChild(empNoField);
-                                                    form.appendChild(deleteField);
-                                                    document.body.appendChild(form);
-
-                                                    form.submit();
-                                                }
-                                            }
-                                        });
-                                    </script>
-
+                                    
                                 </div>
                             </div>
                         </div>
@@ -318,160 +275,9 @@ $result = mysqli_query($conn, $sql);
                     <form id="edit-user-form">
                         <div class="modal-body">
                             <div class="row">
-                                <div class="col-md-6">
-
-                                    <div class="mb-3">
-                                        <label for="edit-user-firstName" class="form-label">First Name</label>
-                                        <input type="text" class="form-control" id="edit-user-firstName" name="firstName">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edit-user-middleName" class="form-label">Middle Name</label>
-                                        <input type="text" class="form-control" id="edit-user-middleName" name="Name">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edit-user-lastName" class="form-label">Last Name</label>
-                                        <input type="text" class="form-control" id="edit-user-lastName" name="lastName">
-                                    </div>
-
-
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="edit-user-gender">
-                                                    Gender
-                                                </label>
-                                                <select class="select2" style="width: 100%; height: 44px;" id="edit-user-gender" name="gender" required>
-                                                    <option value="" disabled selected hidden>Please select</option>
-                                                    <option value="male">Male</option>
-                                                    <option value="female">Female</option>
-                                                    <option value="other">Other</option>
-                                                    <option value="not-say">Prefer not to say</option>
-                                                </select>
-                                            </div>
-
-                                            <style>
-                                                .select2 {
-                                                    padding: 8px;
-                                                    font-size: 14px;
-                                                    border: 1px solid #ccc;
-                                                    border-radius: 5px;
-                                                    appearance: none;
-                                                    -webkit-appearance: none;
-                                                    -moz-appearance: none;
-                                                }
-                                            </style>
-                                        </div>
-
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="edit-user-DOB">
-                                                    Date of birth
-                                                </label>
-                                                <input type="date" class="form-control" id="edit-user-DOB" name="DOB" required style="width: 100%; height: 44px;">
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="edit-user-phoneNumber">Phone
-                                            Number</label>
-                                        <input type="tel" class="form-control" id="edit-user-phoneNumber" pattern="[0-9]{11}" name="phoneNumber">
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="edit-user-address">Home address </label>
-                                        <input type="text" class="form-control" id="edit-user-address" required name="address">
-                                    </div>
-
-                                    <!-- <script>
-                                        // Wait for the page to load
-                                        document.addEventListener('DOMContentLoaded', function() {
-                                            // Create the Autocomplete object with UK address restrictions
-                                            const autocomplete = new google.maps.places.Autocomplete(
-                                                document.getElementById('edit-user-address'), {
-                                                    types: ['geocode'], // Only return geocoding results (addresses)
-                                                    componentRestrictions: {
-                                                        country: 'GB'
-                                                    } // Restrict to UK addresses
-                                                });
-
-                                            // Add an event listener to update the input field with the formatted address when a place is selected
-                                            autocomplete.addListener('place_changed', function() {
-                                                const place = autocomplete.getPlace();
-                                                document.getElementById('edit-user-address').value = place.formatted_address;
-                                            });
-                                        });
-                                    </script> -->
-                                </div>
-
-
-                                <div class="col-md-6">
-
-                                    <div class="form-group">
-                                        <label for="edit-user-accountType">
-                                            Account Type
-                                        </label>
-                                        <select class="select2" style="width: 100%; height: 44px;" id="edit-user-accountType" name="accountType" required>
-                                            <option value="" disabled selected hidden>Please select</option>
-                                            <option value="Employee">Employee</option>
-                                            <option value="Manager">Manager</option>
-                                            <option value="Administrator">Administrator</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <label for="edit-user-empNo" class="form-label">Employee No.</label>
-                                        <input type="text" class="form-control" id="edit-user-empNo" name="empNo" readonly>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="edit-user-teams">
-                                            Search Teams
-                                        </label>
-                                        <input type="text" class="form-control" id="edit-user-teams" name="teams" placeholder="Search Teams" list="teamList" required />
-
-                                        <datalist id="teamList">
-                                            <option value="Team 1">
-                                            <option value="Team 2">
-                                            <option value="Team 3">
-                                                <!-- Add more options for each team -->
-                                        </datalist>
-                                    </div>
-
-                                    <script>
-                                        const searchField = document.getElementById("teamSearch");
-                                        const optionsList = document.querySelectorAll("#teamList option");
-
-                                        searchField.addEventListener("input", function() {
-                                            let options = "";
-                                            optionsList.forEach(function(option) {
-                                                if (option.value.toLowerCase().includes(searchField.value.toLowerCase())) {
-                                                    options += "<option value='" + option.value + "'>" + option.value + "</option>";
-                                                }
-                                            });
-                                            searchField.setAttribute("list", "teamList");
-                                            document.getElementById("teamList").innerHTML = options;
-                                        });
-                                    </script>
-
-                                    <div class="mb-3">
-                                        <label for="edit-user-email" class="form-label">Email</label>
-                                        <input type="email" class="form-control" id="edit-user-email" name="email">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edit-user-password" class="form-label">Create a new password</label>
-                                        <input type="password" class="form-control" id="edit-user-password" name="password">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edit-user-confirmPassword" class="form-label">Confirm new password</label>
-                                        <input type="password" class="form-control" id="edit-user-confirmPassword" name="confirmPassword">
-                                    </div>
-
-                                </div>
+                               
+                              
                             </div>
-                            <hr>
                         </div>
                         <div class="modal-footer d-flex justify-content-center">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -538,7 +344,48 @@ $result = mysqli_query($conn, $sql);
         </script>
 
 </body>
+<script>
+// Get all the team cards
+const teamCards = document.querySelectorAll('.team-card');
 
+// Add event listeners to each team card
+teamCards.forEach(teamCard => {
+  // Add click event listener
+  teamCard.addEventListener('click', function() {
+    // Check if the team card is already selected
+    const isSelected = this.classList.contains('selected');
+
+    // Deselect all the team cards
+    teamCards.forEach(teamCard => {
+      teamCard.classList.remove('selected');
+    });
+
+    // If the team card is not already selected, select it
+    if (!isSelected) {
+      this.classList.add('selected');
+    }
+
+    // Get the edit and delete buttons
+    const editButton = document.getElementById('edit-user');
+    const deleteButton = document.getElementById('delete-user');
+
+    // If a team card is selected, make the edit and delete buttons clickable
+    if (document.querySelector('.team-card.selected')) {
+      editButton.style.opacity = '1';
+      editButton.style.pointerEvents = 'auto';
+      deleteButton.style.opacity = '1';
+      deleteButton.style.pointerEvents = 'auto';
+    } else {
+      // Otherwise, disable the edit and delete buttons
+      editButton.style.opacity = '0.5';
+      editButton.style.pointerEvents = 'none';
+      deleteButton.style.opacity = '0.5';
+      deleteButton.style.pointerEvents = 'none';
+    }
+  });
+});
+
+</script>
 </html>
 
 <?php

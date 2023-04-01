@@ -186,9 +186,14 @@ $total_users = $admin_count + $manager_count + $employee_count;
         <div class="col-md-6">
           <div class="chart-legend">
             <h4 style="font-size: 24px; margin-bottom: 30px;">Active User Accounts</h4>
-            <p style="font-size: 20px; margin-bottom: 35px;">Admins: <?php echo $admin_count; ?></p>
-            <p style="font-size: 20px; margin-bottom: 35px;">Managers: <?php echo $manager_count; ?></p>
-            <p style="font-size: 20px; margin-bottom: 45px;">Employees: <?php echo $employee_count; ?></p>
+            <?php
+              $admin_percent = round($admin_count / $total_users * 100, 2);
+              $manager_percent = round($manager_count / $total_users * 100, 2);
+              $employee_percent = round($employee_count / $total_users * 100, 2);
+            ?>
+            <p style="font-size: 20px; margin-bottom: 35px;">Admins: <?php echo $admin_count; ?> (<?php echo $admin_percent; ?>%)</p>
+            <p style="font-size: 20px; margin-bottom: 35px;">Managers: <?php echo $manager_count; ?> (<?php echo $manager_percent; ?>%)</p>
+            <p style="font-size: 20px; margin-bottom: 45px;">Employees: <?php echo $employee_count; ?> (<?php echo $employee_percent; ?>%)</p>
             <p style="font-size: 20px; margin-bottom: 0;">Total Users: <?php echo $total_users; ?></p>
           </div>
         </div>
@@ -227,28 +232,10 @@ var myPieChart = new Chart(ctx, {
             labels: {
                 fontColor: 'black'
             }
-        },
-        tooltips: {
-            callbacks: {
-                label: function(tooltipItem, data) {
-                    var dataset = data.datasets[tooltipItem.datasetIndex];
-                    var label = data.labels[tooltipItem.index];
-                    var value = dataset.data[tooltipItem.index];
-                    var total = dataset.data.reduce(function(previousValue, currentValue, currentIndex, array) {
-                        return previousValue + currentValue;
-                    });
-                    var percentage = Math.round(value / total * 100);
-                    return label + ': ' + percentage + '%';
-                }
-            }
         }
     }
 });
 </script>
-
-
-
-
 
 
                     </div>

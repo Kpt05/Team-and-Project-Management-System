@@ -141,20 +141,33 @@ $accountType = getAccountType($conn, $empNo);
                                                                 </div>
 
                                                                 <div class="form-group">
+                                                                    <label for="teamType">Department <span style="color: red;">*</span></label>
+                                                                    <select class="select2" style="width: 100%; height: 38px;" id="department" name="department" required>
+                                                                        <option value="" disabled selected hidden>Please select</option>
+                                                                        <option value="SLS">Sales</option>
+                                                                        <option value="MKT">Marketing</option>
+                                                                        <option value="FNC">Finance</option>
+                                                                        <option value="ENG">Engineering</option>
+                                                                        <option value="HR">Human Resources</option>
+                                                                        <option value="OP">Operations</option>
+                                                                        <option value="RD">Research and Development</option>
+                                                                        <option value="CUST">Customer Service</option>
+                                                                        <option value="PM">Product Management</option>
+                                                                        <option value="DES">Design</option>
+                                                                        <option value="IT">Information Technology</option>
+                                                                        <option value="BUS">Business Development</option>
+                                                                        <option value="PUB">Public Relations</option>
+                                                                    </select>
+                                                                </div>
+
+                                                                <div class="form-group">
                                                                     <label for="teamDescription">
                                                                         Team Description:
                                                                     </label>
                                                                     <div style="position: relative;">
-                                                                        <textarea class="form-control" id="teamDescription" name="teamDescription" required maxlength="150" oninput="updateCounter(this)" style="padding-right: 30px;"></textarea>
+                                                                        <textarea class="form-control" id="teamDescription" name="teamDescription" maxlength="150" oninput="updateCounter(this)" style="padding-right: 30px;"></textarea>
                                                                         <span id="counter" style="position: absolute; bottom: 0; right: 10px; font-size: smaller;"></span>
                                                                     </div>
-                                                                </div>
-
-                                                                <div class="form-group">
-                                                                    <label for="teamID">
-                                                                        Team ID: <span style="color: red;">*</span>
-                                                                    </label>
-                                                                    <input type="text" class="form-control" id="firstName" name="firstName" required />
                                                                 </div>
 
                                                                 <div class="form-group">
@@ -162,14 +175,38 @@ $accountType = getAccountType($conn, $empNo);
                                                                         Team Manager/Lead: <span style="color: red;">*</span>
                                                                     </label>
                                                                     <input type="text" class="form-control" id="teamLead" name="teamLead" placeholder="Search for a lead" list="teamList" required />
+                                                                    <input type="hidden" id="teamLeadID" name="teamLeadID">
 
                                                                     <datalist id="teamList">
-                                                                        <option value="Team 1">
-                                                                        <option value="Team 2">
-                                                                        <option value="Team 3">
-                                                                            <!-- Add more options for each team -->
+                                                                        <?php
+                                                                        // Query the users table to get all users with accountType "Manager"
+                                                                        $sql = "SELECT UserID, CONCAT(firstName, ' ', lastName) AS fullName FROM Users WHERE accountType = 'Manager'";
+                                                                        $result = mysqli_query($conn, $sql);
+
+                                                                        // Loop through the query results and display them as options in the datalist
+                                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                                            echo "<option value='" . $row["fullName"] . "' data-value='" . $row["UserID"] . "'>";
+                                                                        }
+
+                                                                        // Close the database connection
+                                                                        mysqli_close($conn);
+                                                                        ?>
                                                                     </datalist>
+
+                                                                    <script>
+                                                                        // Listen for changes on the datalist input
+                                                                        document.getElementById("teamLead").addEventListener("input", function() {
+                                                                            // Get the selected option and set the hidden input value to the corresponding data-value attribute
+                                                                            var option = document.querySelector("#teamList option[value='" + this.value + "']");
+                                                                            if (option) {
+                                                                                document.getElementById("teamLeadID").value = option.getAttribute("data-value");
+                                                                            }
+                                                                        });
+                                                                    </script>
                                                                 </div>
+
+
+
 
                                                                 <script>
                                                                     function updateCounter(field) {
@@ -187,24 +224,21 @@ $accountType = getAccountType($conn, $empNo);
                                                                     $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
                                                                     echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
                                                                 }
-                                                                //Password mismatch
-                                                                else if (isset($_GET['error']) && $_GET['error'] === "passwordsdontmatch") {
+
+                                                                //Team Name already exists
+                                                                else if (isset($_GET['error']) && $_GET['error'] === "teamnamealreadyexists") {
                                                                     $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
                                                                     echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
-                                                                }
-                                                                //Email already exists
-                                                                else if (isset($_GET['error']) && $_GET['error'] === "emailalreadyexists") {
-                                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
-                                                                    //Employee Number already exists
-                                                                } else if (isset($_GET['error']) && $_GET['error'] === "useralreadyexists") {
+
+                                                                    //Team ID already exists
+                                                                } else if (isset($_GET['error']) && $_GET['error'] === "teamidalreadyexists") {
                                                                     $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
                                                                     echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
                                                                 }
                                                                 ?>
                                                                 <!-- End of error message -->
 
-                                                                <button type="submit" name="submit" class="form-control btn     btn-primary rounded submit px-3">
+                                                                <button type="submit" name="createTeam" class="form-control btn     btn-primary rounded submit px-3">
                                                                     <b>Add user</b>
                                                                 </button>
 

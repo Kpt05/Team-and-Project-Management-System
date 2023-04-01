@@ -353,6 +353,7 @@ $accountType = getAccountType($conn, $empNo);
                                                             ?>
                                                             <!-- End of error message -->
 
+                                                            
                                                             <button type="submit" name="submit" class="form-control btn     btn-primary rounded submit px-3">
                                                                 <b>Add user</b>
                                                             </button>
