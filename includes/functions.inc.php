@@ -24,6 +24,30 @@ function emptyInputSignup(
     return $result;
 }
 
+
+//Function to check for empty fields in signup form
+function emptyInputTeam(
+    $teamName,
+    $teamDescription,
+    $teamID,
+    $teamLead
+) {
+    $result = '';
+    if (empty($teamName) || empty($teamDescription) || empty($teamID) || empty($teamLead)) {
+        $result = true;
+    } else {
+        $result = false;
+    }
+    return $result;
+}
+
+
+
+
+
+
+
+
 //Function to check if password and confirm password match
 function passwordMatch($password, $confirmPassword)
 {
@@ -81,6 +105,57 @@ function empNoExists($conn, $empNo)
         return $result;
     }
 }
+
+
+//Function to check if team name already exists
+function teamNameExists ($conn, $teamName)
+{
+    $sql = "SELECT * FROM Teams WHERE teamName = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../teams/viewTeam.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $teamName);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row;
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+
+//Function to check if teamID already exists
+function teamIDExists ($conn, $teamID)
+{
+    $sql = "SELECT * FROM Teams WHERE teamID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../teams/viewTeam.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $teamID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row;
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+
+
 
 //Function to check for empty fields in login form 
 function emptyInputLogin($email, $password)
@@ -140,6 +215,50 @@ function createUser($conn, $firstName, $middleName, $lastName, $gender, $DOB, $p
     }
 }
 
+
+// Function to create a new Team
+function createTeam($conn, $teamID ,$teamName, $teamDescription, $department, $teamLeadID, $teamLead )
+{
+    $conn->begin_transaction();
+    $sql = "INSERT INTO Teams (teamID, teamName, teamDescription, department, teamLeadID, teamLead) 
+    VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->stmt_init();
+    if (!$stmt->prepare($sql)) {
+        $error = "SQL statement failed: " . $conn->error;
+        $conn->rollback();
+        header("Location: ../createTeam.php?error=" . $error);
+        exit();
+    } else {
+        // Bind parameters
+        $stmt->bind_param("ssssis", $teamID, $teamName, $teamDescription, $department, $teamLeadID, $teamLead);
+
+        if (!$stmt->execute()) {
+            $error = "Error executing statement: " . $stmt->error;
+            $conn->rollback();
+            header("Location: ../createTeam.php?error=" . $error);
+            exit();
+        } else {
+            $conn->commit();
+            header("Location: ../teams/viewTeam.php"); //Redirect to Team View page
+            exit();
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function getFirstName($conn, $empNo)
 {
     $sql = "SELECT firstName FROM Users WHERE empNo = ?;";
@@ -185,7 +304,6 @@ function getLastName($conn, $empNo)
     }
 }
 
-
 function getAccountType($conn, $empNo)
 {
     $sql = "SELECT accountType FROM Users WHERE empNo = ?;";
@@ -207,16 +325,6 @@ function getAccountType($conn, $empNo)
         return $result;
     }
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
