@@ -327,6 +327,27 @@ function getAccountType($conn, $empNo)
 }
 
 
+function getUserID($conn, $empNo)
+{
+    $sql = "SELECT userID FROM Users WHERE empNo = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../index.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $empNo);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row['userID'];
+    } else {
+        $result = false;
+        return $result;
+    }
+}
 
 function deleteUser($conn, $empNo)
 {
@@ -352,3 +373,131 @@ function deleteUser($conn, $empNo)
         }
     }
 }
+
+
+
+
+
+
+
+
+
+function getUserStatus($conn,$userID) {
+
+    // Query to get the latest clocking record for the user
+    $query = "SELECT * FROM clockings WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+    $result = mysqli_query($conn, $query);
+    
+    // Check if the user has any clocking records
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $clockOutTime = $row["clockOutTime"];
+        $breakEndTime = $row["breakEndTime"];
+        
+        // Check if the user is currently clocked in
+        if ($clockOutTime == NULL) {
+            // Check if the user is on break
+            if ($breakEndTime == NULL) {
+                return "Clocked In";
+            } else {
+                return "On Break";
+            }
+        } else {
+            return "Clocked Out";
+        }
+    } else {
+        return "Not Clocked In";
+    }
+}
+
+
+function clockIn($conn,$userID) {
+
+    // Insert a new clocking record for the user
+    $query = "INSERT INTO clockings (UserID, clockInTime) VALUES ($userID, NOW())";
+    $result = mysqli_query($conn, $query);
+    
+    if ($result) {
+        return "Clocked In Successfully";
+    } else {
+        return "Error: " . mysqli_error($conn);
+    }
+}
+
+function clockOut($conn, $userID) {
+
+    // Update the latest clocking record for the user with clock-out time
+    $query = "UPDATE clockings SET clockOutTime = NOW() WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+    $result = mysqli_query($conn, $query);
+    
+    if ($result) {
+        return "Clocked Out Successfully";
+    } else {
+        return "Error: " . mysqli_error($conn);
+    }
+}
+
+function startBreak($conn, $userID) {
+
+    // Update the latest clocking record for the user with break start time
+    $query = "UPDATE clockings SET breakStartTime = NOW() WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+    $result = mysqli_query($conn, $query);
+    
+    if ($result) {
+        return "Break Started Successfully";
+    } else {
+        return "Error: " . mysqli_error($conn);
+    }
+}
+
+function endBreak($conn, $userID) {
+
+    // Update the latest clocking record for the user with break end time
+    $query = "UPDATE clockings SET breakEndTime = NOW() WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+    $result = mysqli_query($conn, $query);
+    
+    if ($result) {
+        // Calculate hours worked and break duration
+        $query = "SELECT clockInTime, clockOutTime, breakStartTime, breakEndTime FROM clockings WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+        $result = mysqli_query($conn, $query);
+        $row = mysqli_fetch_assoc($result);
+        $clockInTime = strtotime($row["clockInTime"]);
+        $clockOutTime = strtotime($row["clockOutTime"]);
+        $breakStartTime = strtotime($row["breakStartTime"]);
+        $breakEndTime = strtotime($row["breakEndTime"]);
+        $hoursWorked = ($clockOutTime - $clockInTime - ($breakEndTime - $breakStartTime)) / 3600;
+        $breakDuration = ($breakEndTime - $breakStartTime) / 60;
+        
+        // Update the latest clocking record for the user with hours worked and break duration
+        $query = "UPDATE clockings SET hoursWorked = $hoursWorked, breakDuration = $breakDuration WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+        $result = mysqli_query($conn, $query);
+        
+        if ($result) {
+            return "Break Ended Successfully";
+        } else {
+            return "Error: " . mysqli_error($conn);
+        }
+    } else {
+        return "Error: " . mysqli_error($conn);
+    }
+}
+
+function displayClockingHistory($conn,$userID) {
+
+    // Retrieve all clocking records for the user
+    $query = "SELECT * FROM clockings WHERE UserID = $userID ORDER BY ClockingsID DESC";
+    $result = mysqli_query($conn, $query);
+    
+    // Display the clocking history in a table
+    if (mysqli_num_rows($result) > 0) {
+        echo "<table>";
+        echo "<tr><th>Clocking ID</th><th>Clock-In Time</th><th>Clock-Out Time</th><th>Break Start Time</th><th>Break End Time</th><th>Hours Worked</th><th>Break Duration</th></tr>";
+        while ($row = mysqli_fetch_assoc($result)) {
+            echo "<tr><td>" . $row["ClockingsID"] . "</td><td>" . $row["clockInTime"] . "</td><td>" . $row["clockOutTime"] . "</td><td>" . $row["breakStartTime"] . "</td><td>" . $row["breakEndTime"] . "</td><td>" . $row["hoursWorked"] . "</td><td>" . $row["breakDuration"] . "</td></tr>";
+        }
+        echo "</table>";
+    } else {
+        echo "No clocking history found for this user.";
+    }
+}
+

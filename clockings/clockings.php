@@ -9,8 +9,12 @@ $conn = require '../includes/dbconfig.php';
 session_start();
 $empNo = $_SESSION['empNo'];
 $firstName = getFirstName($conn, $empNo);
+$user_id = getUserId($conn, $empNo);
 $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
+
+
+
 ?>
 
 <!--Created by Kevin Titus on 2022-07-21.-->
@@ -113,269 +117,51 @@ $accountType = getAccountType($conn, $empNo);
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="row">
-                        <div class="col-md-12 grid-margin">
-                            <div class="row">
-                                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-                                    <h3 class="font-weight-bold">Create system user</h3>
-                                </div>
-                                <div class="row"></div>
-                                <div class="col-lg-12 grid-margin stretch-card">
-                                    <div class="card">
-                                        <div class="card-body">
-                                            <h4 class="card-title">Personal Details</h4>
-                                            <div class="container-fluid">
-
-                                                <form action="../includes/signup.inc.php" method="POST">
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            <div class="row">
-                                                                <div class="col-md-6" style="border-right: 1px solid rgba(103, 103, 103, 0.25); margin-bottom:10px;">
-
-                                                                    <div class="form-group">
-                                                                        <label for="firstName">
-                                                                            First Name <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="firstName" name="firstName" required />
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="middleName">
-                                                                            Middle Name
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="middleName" name="middleName" />
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="lastName">
-                                                                            Last Name <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="lastName" name="lastName" required />
-                                                                    </div>
-
-
-                                                                    <div class="row">
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label for="gender">
-                                                                                    Gender <span style="color: red;">*</span>
-                                                                                </label>
-                                                                                <select class="select2" style="width: 100%; height: 38px;" id="gender" name="gender" required>
-                                                                                    <option value="" disabled selected hidden>Please select</option>
-                                                                                    <option value="male">Male</option>
-                                                                                    <option value="female">Female</option>
-                                                                                    <option value="other">Other</option>
-                                                                                    <option value="not-say">Prefer not to say</option>
-                                                                                </select>
-                                                                            </div>
-
-                                                                            <style>
-                                                                                .select2 {
-                                                                                    padding: 8px;
-                                                                                    font-size: 14px;
-                                                                                    border: 1px solid #ccc;
-                                                                                    border-radius: 5px;
-                                                                                    appearance: none;
-                                                                                    -webkit-appearance: none;
-                                                                                    -moz-appearance: none;
-                                                                                }
-                                                                            </style>
-                                                                        </div>
-
-
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label for="DOB">
-                                                                                    Date of birth <span style="color: red;">*</span>
-                                                                                </label>
-                                                                                <input type="date" class="form-control" id="DOB" name="DOB" required />
-                                                                            </div>
-                                                                        </div>
-
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="phoneNumber">Phone
-                                                                            Number</label>
-                                                                        <input type="tel" class="form-control" id="phoneNumber" pattern="[0-9]{11}" name="phoneNumber">
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="addressInput">Home address <span style="color: red;">*</span></label>
-                                                                        <input type="text" class="form-control" id="address" required name="address">
-                                                                    </div>
-
-                                                                    <script>
-                                                                        // Wait for the page to load
-                                                                        document.addEventListener('DOMContentLoaded', function() {
-                                                                            // Create the Autocomplete object with UK address restrictions
-                                                                            const autocomplete = new google.maps.places.Autocomplete(
-                                                                                document.getElementById('address'), {
-                                                                                    types: ['geocode'], // Only return geocoding results (addresses)
-                                                                                    componentRestrictions: {
-                                                                                        country: 'GB'
-                                                                                    } // Restrict to UK addresses
-                                                                                });
-
-                                                                            // Add an event listener to update the input field with the formatted address when a place is selected
-                                                                            autocomplete.addListener('place_changed', function() {
-                                                                                const place = autocomplete.getPlace();
-                                                                                document.getElementById('address').value = place.formatted_address;
-                                                                            });
-                                                                        });
-                                                                    </script>
-
-                                                                    <style>
-                                                                        .form-group {
-                                                                            margin-bottom: 1rem;
-                                                                        }
-
-                                                                        label {
-                                                                            font-weight: bold;
-                                                                        }
-
-                                                                        input.form-control {
-                                                                            height: calc(2.25rem + 2px);
-                                                                            padding: .375rem .75rem;
-                                                                            font-size: 1rem;
-                                                                            line-height: 1.5;
-                                                                            border-radius: .25rem;
-                                                                            border: 1px solid #ced4da;
-                                                                        }
-                                                                    </style>
-                                                                </div>
-
-
-                                                                <div class="col-md-6">
-
-                                                                    <div class="form-group">
-                                                                        <label for="accountType">
-                                                                            Account Type <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <select class="select3" style="width: 100%;" id="accountType" name="accountType" required>
-                                                                            <option value="" disabled selected hidden>Please select</option>
-                                                                            <option value="Employee">Employee</option>
-                                                                            <option value="Manager">Manager</option>
-                                                                            <option value="Administrator">Administrator</option>
-                                                                        </select>
-                                                                    </div>
-
-
-                                                                    <style>
-                                                                        .select3 {
-                                                                            padding: 8px;
-                                                                            font-size: 14px;
-                                                                            border: 1px solid #ccc;
-                                                                            border-radius: 5px;
-                                                                            appearance: none;
-                                                                            -webkit-appearance: none;
-                                                                            -moz-appearance: none;
-                                                                        }
-                                                                    </style>
-
-
-                                                                    <div class="form-group">
-                                                                        <label for="empNo">
-                                                                            Employee Number <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="empNo" placeholder="Enter a 13 digit number" pattern="[0-9]{13}" name="empNo" required>
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="teams">
-                                                                            Search Teams <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="teams" name="teams" placeholder="Search Teams" list="teamList" required />
-
-                                                                        <datalist id="teamList">
-                                                                            <option value="Team 1">
-                                                                            <option value="Team 2">
-                                                                            <option value="Team 3">
-                                                                                <!-- Add more options for each team -->
-                                                                        </datalist>
-                                                                    </div>
-
-
-                                                                    <script>
-                                                                        const searchField = document.getElementById("teamSearch");
-                                                                        const optionsList = document.querySelectorAll("#teamList option");
-
-                                                                        searchField.addEventListener("input", function() {
-                                                                            let options = "";
-                                                                            optionsList.forEach(function(option) {
-                                                                                if (option.value.toLowerCase().includes(searchField.value.toLowerCase())) {
-                                                                                    options += "<option value='" + option.value + "'>" + option.value + "</option>";
-                                                                                }
-                                                                            });
-                                                                            searchField.setAttribute("list", "teamList");
-                                                                            document.getElementById("teamList").innerHTML = options;
-                                                                        });
-                                                                    </script>
-
-                                                                    <div class="form-group">
-                                                                        <label class="label" for="email">Email <span style="color: red;">*</span></label>
-                                                                        <input type="email" class="form-control" placeholder="example.1234@sourcetech.net" required name="email" id="email" />
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label for="password">Create a password <span style="color: red;">*</span></label>
-                                                                        <input type="password" class="form-control" placeholder="Password" required name="password" id="password" />
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label for="confirmPassword">Confirm Password <span style="color: red;">*</span></label>
-                                                                        <input type="password" class="form-control" placeholder="Enter your password again" required name="confirmPassword" id="confirmPassword" />
-                                                                    </div>
-
-
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Error message -->
-                                                            <?php
-                                                            //Empty input
-                                                            if (isset($_GET['error']) && $_GET['error'] === "emptyinput") {
-                                                                $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                                                echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
-                                                            }
-                                                            //Password mismatch
-                                                            else if (isset($_GET['error']) && $_GET['error'] === "passwordsdontmatch") {
-                                                                $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                                                echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
-                                                            }
-                                                            //Email already exists
-                                                            else if (isset($_GET['error']) && $_GET['error'] === "emailalreadyexists") {
-                                                                $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                                                echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
-                                                                //Employee Number already exists
-                                                            } else if (isset($_GET['error']) && $_GET['error'] === "useralreadyexists") {
-                                                                $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
-                                                                echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
-                                                            }
-                                                            ?>
-                                                            <!-- End of error message -->
-
-                                                            <button type="submit" name="submit" class="form-control btn     btn-primary rounded submit px-3">
-                                                                <b>Add user</b>
-                                                            </button>
-
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                  
 
 
 
-                            <!-- content-wrapper ends -->
 
-                            <!-- partial:includes/_footer.php -->
-                            <?php include("../includes/_footer.php"); ?>
-                            <!-- partial -->
-                        </div>
-                        <!-- main-panel ends -->
-                    </div>
+
+
+
+                <div class="row">
+    <div class="col-md-12 grid-margin">
+        <div class="row justify-content-center">
+            <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                <h2 class="font-weight-bold">Clockings</h2>
+            </div>
+            <div class="col-12 col-xl-4 text-right font-weight-bold" style="font-size: 23px; margin-top: 20px; margin-right: -50px; text-align: right;">
+                <div class="text-center">
+                    <?php
+                    $date = date('l, j M');
+                    $time = date('H:i');
+                    echo "<div>$date</div>";
+                    echo "<div>$time</div>";
+
+                    // get user status
+                    $status = getUserStatus($conn, $userID);
+                    ?>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-4">
+            <div class="col-12 col-xl-8 text-center font-weight-bold">
+                <div style="font-size: 40px; font-weight: bold;"><?php echo $status; ?></div>
+            </div>
+        </div>
+        <!-- content-wrapper ends -->
+        <!-- partial:includes/_footer.php -->
+        <?php include("../includes/_footer.php"); ?>
+        <!-- partial -->
+    </div>
+    <!-- main-panel ends -->
+</div>
+
+
+
+
+
                     <!-- page-body-wrapper ends -->
                 </div>
                 <!-- container-scroller -->
@@ -412,21 +198,7 @@ $accountType = getAccountType($conn, $empNo);
                     }
                 </script>
 
-                <script>
-                    $(function() {
-                        var sixteenYearsAgo = new Date();
-                        var hundredYearsAgo = new Date();
-                        sixteenYearsAgo.setFullYear(sixteenYearsAgo.getFullYear() - 16);
-                        hundredYearsAgo.setFullYear(hundredYearsAgo.getFullYear() - 65);
 
-                        var maxDate = sixteenYearsAgo.toISOString().split('T')[0];
-                        var minDate = hundredYearsAgo.toISOString().split('T')[0];
-
-                        $('#DOB').attr('max', maxDate);
-                        $('#DOB').attr('min', minDate);
-                        $('#DOB').val(maxDate);
-                    });
-                </script>
 
             </div>
         </div>
