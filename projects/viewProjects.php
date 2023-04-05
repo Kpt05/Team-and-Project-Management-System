@@ -2,15 +2,38 @@
 PHP intergration
 -->
 <?php
+require_once('../includes/functions.inc.php');
 // Make a database connection
 $conn = require '../includes/dbconfig.php';
+
+session_start();
+$empNo = $_SESSION['empNo'];
+$firstName = getFirstName($conn, $empNo);
+$lastName = getLastName($conn, $empNo);
+$accountType = getAccountType($conn, $empNo);
+
+
+if (isset($_POST['delete'])) {
+    $empNo = $_POST['empNo'];
+    $sql = "DELETE FROM Users WHERE empNo='$empNo'";
+    mysqli_query($conn, $sql);
+}
 
 // Define the SQL query to retrieve data from the Users Table
 $sql = "SELECT * FROM Users";
 
 // Execute the query and get the result set
 $result = mysqli_query($conn, $sql);
+
+$sql = "SELECT * FROM Teams";
+$result = mysqli_query($conn, $sql);
+
 ?>
+
+
+
+
+
 
 <!--Created by Kevin Titus on 2022-07-19.-->
 <!DOCTYPE html>
@@ -20,7 +43,7 @@ $result = mysqli_query($conn, $sql);
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>My Dashboard | Source Tech Portal</title>
+    <title>View Projects | Source Tech Portal</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
@@ -78,6 +101,91 @@ $result = mysqli_query($conn, $sql);
             visibility: hidden;
         }
     }
+
+    .team-card {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin: 10px;
+        display: inline-block;
+        width: 265px;
+        box-sizing: border-box;
+        vertical-align: top;
+        position: relative;
+        border-radius: 10px;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .team-card:hover {
+        box-shadow: 0 0 5px #ddd;
+    }
+
+    .team-card .team-pic {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        margin-bottom: 10px;
+        background-color: #ddd;
+        background-size: cover;
+        background-position: center;
+        display: inline-block;
+        border: 5px solid white;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    }
+
+    .team-card .team-name {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+        color: #375577;
+        text-shadow: 1px 1px #ddd;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .team-card .team-info {
+        font-size: 14px;
+        margin-bottom: 5px;
+        color: black;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .create-team-card {
+        border: 1px dashed #ddd;
+        padding: 10px;
+        margin: 10px;
+        display: inline-block;
+        width: 265px;
+        height: 220px;
+        box-sizing: border-box;
+        vertical-align: top;
+        position: relative;
+        cursor: pointer;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .create-team-card:hover {
+        border-color: #999;
+    }
+
+    .create-team-card .create-team-icon {
+        font-size: 48px;
+        color: #ddd;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    .team-card.selected {
+    border: 2px solid #375577;
+  }
 </style>
 
 <body>
@@ -100,105 +208,60 @@ $result = mysqli_query($conn, $sql);
             <!-- partial:includes/_adminsidebar.php -->
             <?php include '../includes/_adminsidebar.php'; ?>
 
-
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="row">
-                        <div class="col-md-12 grid-margin">
-                            <div class="row">
-                                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-                                    <h2 class="font-weight-bold">View projects</h2>
-                                    <h6 class="font-weight-normal mb-0">
-                                        All systems are running smoothly! You have
-                                        <span class="text-primary">3 unread alerts!</span>
-                                    </h6>
-                                </div>
-                                <div class="col-12 col-xl-4">
-                                    <div class="justify-content-end d-flex">
-
-                                        <!-- might wanna put something here -->
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="col-md-8">
+                            <h2 class="font-weight-bold">View Projects</h2>
+                        </div>
+                        <div class="col-md-4 text-md-right">
+                            <a href="createProjects.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
+                                <i class="bi bi-plus" style="font-size: 1.5rem; color: #375577;"></i>
+                            </a>
+                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-user" style="opacity: 0.5; pointer-events: none;">
+                                <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
+                            </button>
+                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="delete-user" style="opacity: 0.5; pointer-events: none;">
+                                <i class="bi bi-trash3" style="font-size: 1.5rem; color: #375577;"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="row">
+                    <div class="row mt-4">
                         <div class="col-lg-12 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
 
-
-                                    <div class="table-responsive">
-                                        <table id="data-table-basic" class="table table-hover">
-                                            <thead>
-                                                <tr>
-                                                    <th>Employee No.</th>
-                                                    <th>Name</th>
-                                                    <th>Role</th>
-                                                    <th>Email</th>
-                                                    <th>Team</th>
-                                                    <th>Gender</th>
-                                                    <th>DOB</th>
-                                                    <th>Phone</th>
-                                                    <th>Address</th>
-
-                                                    <th>Report</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <?php
-                                                // Loop through each row in the result set and output the data
-                                                while ($row = mysqli_fetch_assoc($result)) {
-                                                    echo "<tr onclick=\"highlightRow(this)\">";
-                                                    echo "<td>" . $row['empNo'] . "</td>";
-                                                    echo "<td>" . $row['firstName'] . " " . $row['lastName'] . "</td>";
-
-                                                    echo "<td>" . $row['accountType'] . "</td>";
-                                                    echo "<td>" . $row['email'] . "</td>";
-                                                    echo "<td>" . $row['teams'] . "</td>";
-                                                    echo "<td>" . $row['gender'] . "</td>";
-                                                    echo "<td>" . $row['DOB'] . "</td>";
-                                                    echo "<td>" . $row['phone'] . "</td>";
-                                                    echo "<td>" . $row['address'] . "</td>";
-                                                    echo "<td>" . $row['Report'] . "</td>";
-                                                    echo "</tr>";
-                                                }
-                                                ?>
-                                            </tbody>
-
-                                        </table>
+                                    <?php
+                                    while ($row = mysqli_fetch_assoc($result)) {
+                                        echo '<div class="team-card">';
+                                        echo '<div class="team-pic" style="background-image: url(' . $row["team_pic"] . ');"></div>';
+                                        echo '<div class="team-name">' . $row["teamName"] . '</div>';
+                                        echo '<div class="team-info">Team ID: ' . $row["teamID"] . '</div>';
+                                        echo '<div class="team-info">Department: ' . $row["department"] . '</div>';
+                                        echo '<div class="team-info">Team Lead: ' . $row["teamLead"] . '</div>';
+                                        echo '<div class="team-info">Contact Email: ' . $row["teamID"] . '</div>';
+                                        echo '</div>';
+                                    }
+                                    ?>
+                                    <div class="create-team-card" onclick="location.href='createProjects.php';">
+                                        <div class="create-team-icon">+</div>
                                     </div>
 
-                                    <script>
-                                        function highlightRow(row) {
-                                            if (row.classList.contains('selected')) {
-                                                row.classList.remove('selected');
-                                            } else {
-                                                row.classList.add('selected');
-                                            }
-                                        }
-                                    </script>
-
-                                    </table>
+                                    
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- content-wrapper ends -->
-
-
-            <!-- partial:includes/_footer.php -->
-            <?php include("../includes/_footer.php"); ?>
+                <!-- partial:includes/_footer.php -->
+                <?php include("../includes/_footer.php"); ?>
             <!-- partial -->
-
-
         </div>
         <!-- main-panel ends -->
     </div>
+
     <!-- page-body-wrapper ends -->
     </div>
     <!-- container-scroller -->
@@ -258,4 +321,48 @@ $result = mysqli_query($conn, $sql);
 
 </body>
 
+
+
+<script>
+// Get all the team cards
+const teamCards = document.querySelectorAll('.team-card');
+
+// Add event listeners to each team card
+teamCards.forEach(teamCard => {
+  // Add click event listener
+  teamCard.addEventListener('click', function() {
+    // Check if the team card is already selected
+    const isSelected = this.classList.contains('selected');
+
+    // Deselect all the team cards
+    teamCards.forEach(teamCard => {
+      teamCard.classList.remove('selected');
+    });
+
+    // If the team card is not already selected, select it
+    if (!isSelected) {
+      this.classList.add('selected');
+    }
+
+    // Get the edit and delete buttons
+    const editButton = document.getElementById('edit-user');
+    const deleteButton = document.getElementById('delete-user');
+
+    // If a team card is selected, make the edit and delete buttons clickable
+    if (document.querySelector('.team-card.selected')) {
+      editButton.style.opacity = '1';
+      editButton.style.pointerEvents = 'auto';
+      deleteButton.style.opacity = '1';
+      deleteButton.style.pointerEvents = 'auto';
+    } else {
+      // Otherwise, disable the edit and delete buttons
+      editButton.style.opacity = '0.5';
+      editButton.style.pointerEvents = 'none';
+      deleteButton.style.opacity = '0.5';
+      deleteButton.style.pointerEvents = 'none';
+    }
+  });
+});
+
+</script>
 </html>
