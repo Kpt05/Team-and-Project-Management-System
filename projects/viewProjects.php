@@ -13,10 +13,12 @@ $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
 
 
-if (isset($_POST['delete'])) {
-    $empNo = $_POST['empNo'];
-    $sql = "DELETE FROM Users WHERE empNo='$empNo'";
-    mysqli_query($conn, $sql);
+if (isset($_POST['delete-project'])) {
+    $projectID = $_POST["projectID"];
+    $query = "DELETE FROM projects WHERE projectID = $projectID";
+    mysqli_query($conn, $query);
+    header("Location: viewProjects.php");
+    exit();
 }
 
 // Define the SQL query to retrieve data from the Users Table
@@ -27,6 +29,7 @@ $result = mysqli_query($conn, $sql);
 
 $sql = "SELECT * FROM Projects";
 $result = mysqli_query($conn, $sql);
+
 
 ?>
 
@@ -178,8 +181,8 @@ $result = mysqli_query($conn, $sql);
     }
 
     .team-card.selected {
-    border: 2px solid #375577;
-  }
+        border: 2px solid #375577;
+    }
 </style>
 
 <body>
@@ -196,9 +199,6 @@ $result = mysqli_query($conn, $sql);
 
         <div class="container-fluid page-body-wrapper">
 
-            <!-- partial:includes/_settings-panel.html -->
-            <?php include "../includes/_settings-panel.php"; ?>
-
             <!-- partial:includes/_adminsidebar.php -->
             <?php include '../includes/_adminsidebar.php'; ?>
 
@@ -213,10 +213,10 @@ $result = mysqli_query($conn, $sql);
                             <a href="createProjects.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
                                 <i class="bi bi-plus" style="font-size: 1.5rem; color: #375577;"></i>
                             </a>
-                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-user" style="opacity: 0.5; pointer-events: none;">
+                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-project" style="opacity: 0.5; pointer-events: none;">
                                 <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
                             </button>
-                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="delete-user" style="opacity: 0.5; pointer-events: none;">
+                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="delete-project" style="opacity: 0.5; pointer-events: none;">
                                 <i class="bi bi-trash2" style="font-size: 1.5rem; color: #375577;"></i>
                             </button>
                         </div>
@@ -226,37 +226,44 @@ $result = mysqli_query($conn, $sql);
                         <div class="col-lg-12 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
-
                                     <?php
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo '<div class="team-card">';
                                         echo '<div class="team-pic" style="background-image: url(' . $row["team_pic"] . ');"></div>';
                                         echo '<div class="team-name">' . $row["projectName"] . '</div>';
-                                        echo '<div class="team-info">Project ID: ' . $row["projectID"] . '</div>';
+                                        echo '<div class="team-info" data-projectID="' . $row["projectID"] . '">Project ID: ' . $row["projectID"] . '</div>';
                                         echo '<div class="team-info">Status: ' . $row["projectStatus"] . '</div>';
-                                        echo '<div class="team-info">Team Lead: ' . $row["projectLeadID"] . '</div>';
-                                        echo '<div class="team-info">Contact Email: ' . $row["teamID"] . '</div>';
+                                        // Retrieve full name and email of project lead from Users table
+                                        $projectID = $row["projectID"];
+                                        $projectLeadID = $row["projectLeadID"];
+                                        $query = "SELECT CONCAT(firstName, ' ', lastName) AS fullName, email FROM Users WHERE userID = $projectLeadID";
+                                        $result2 = mysqli_query($conn, $query);
+                                        $projectLeadRow = mysqli_fetch_assoc($result2);
+                                        $projectLeadFullName = $projectLeadRow["fullName"];
+                                        $projectLeadEmail = $projectLeadRow["email"];
+                                        echo '<div class="team-info">Team Lead: ' . $projectLeadFullName . '</div>';
+                                        // Make the email address clickable and opens the default email client
+                                        echo '<div class="team-info">Email: <a href="mailto:' . $projectLeadEmail . '">' . $projectLeadEmail . '</a></div>';
                                         echo '</div>';
                                     }
                                     ?>
                                     <div class="create-team-card" onclick="location.href='createProjects.php';">
                                         <div class="create-team-icon">+</div>
                                     </div>
-
-                                    
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- partial:includes/_footer.php -->
                 <?php include("../includes/_footer.php"); ?>
-            <!-- partial -->
+                <!-- partial -->
+            </div>
+            <!-- main-panel ends -->
         </div>
-        <!-- main-panel ends -->
-    </div>
 
-    <!-- page-body-wrapper ends -->
+        <!-- page-body-wrapper ends -->
     </div>
     <!-- container-scroller -->
 
@@ -318,45 +325,84 @@ $result = mysqli_query($conn, $sql);
 
 
 <script>
-// Get all the team cards
-const teamCards = document.querySelectorAll('.team-card');
+    // Get all the team cards
+    const teamCards = document.querySelectorAll('.team-card');
 
-// Add event listeners to each team card
-teamCards.forEach(teamCard => {
-  // Add click event listener
-  teamCard.addEventListener('click', function() {
-    // Check if the team card is already selected
-    const isSelected = this.classList.contains('selected');
-
-    // Deselect all the team cards
+    // Add event listeners to each team card
     teamCards.forEach(teamCard => {
-      teamCard.classList.remove('selected');
+        // Add click event listener
+        teamCard.addEventListener('click', function() {
+            // Check if the team card is already selected
+            const isSelected = this.classList.contains('selected');
+
+            // Deselect all the team cards
+            teamCards.forEach(teamCard => {
+                teamCard.classList.remove('selected');
+            });
+
+            // If the team card is not already selected, select it
+            if (!isSelected) {
+                this.classList.add('selected');
+            }
+
+            // Get the edit and delete buttons
+            const editButton = document.getElementById('edit-project');
+            const deleteButton = document.getElementById('delete-project');
+
+            // If a team card is selected, make the edit and delete buttons clickable
+            if (document.querySelector('.team-card.selected')) {
+                editButton.style.opacity = '1';
+                editButton.style.pointerEvents = 'auto';
+                deleteButton.style.opacity = '1';
+                deleteButton.style.pointerEvents = 'auto';
+            } else {
+                // Otherwise, disable the edit and delete buttons
+                editButton.style.opacity = '0.5';
+                editButton.style.pointerEvents = 'none';
+                deleteButton.style.opacity = '0.5';
+                deleteButton.style.pointerEvents = 'none';
+            }
+        });
     });
 
-    // If the team card is not already selected, select it
-    if (!isSelected) {
-      this.classList.add('selected');
-    }
+    const deleteBtn = document.getElementById('delete-project');
 
-    // Get the edit and delete buttons
-    const editButton = document.getElementById('edit-user');
-    const deleteButton = document.getElementById('delete-user');
+    deleteBtn.addEventListener('click', () => {
+        // Get the selected project card
+        const selectedTeamCard = document.querySelector('.team-card.selected');
+        if (selectedTeamCard) {
+            const projectID = selectedTeamCard.querySelector('.team-info').dataset.projectid;
 
-    // If a team card is selected, make the edit and delete buttons clickable
-    if (document.querySelector('.team-card.selected')) {
-      editButton.style.opacity = '1';
-      editButton.style.pointerEvents = 'auto';
-      deleteButton.style.opacity = '1';
-      deleteButton.style.pointerEvents = 'auto';
-    } else {
-      // Otherwise, disable the edit and delete buttons
-      editButton.style.opacity = '0.5';
-      editButton.style.pointerEvents = 'none';
-      deleteButton.style.opacity = '0.5';
-      deleteButton.style.pointerEvents = 'none';
-    }
-  });
-});
-
+            // Show a confirmation dialog
+            const confirmDelete = confirm(`Are you sure you want to delete Project ID ${projectID}?`);
+            if (confirmDelete) {
+                // Create a form dynamically
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = 'viewProjects.php';
+                
+                // Create a hidden input field for the projectID
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'projectID';
+                input.value = projectID;
+                
+                // Append the input field to the form
+                form.appendChild(input);
+                
+                // Append the form to the body and submit it
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    });
 </script>
+
+<!-- Add the delete project form to your HTML -->
+<form id="delete-form" method="post" style="display:none;">
+    <input type="hidden" name="projectID" id="delete-project-id">
+    <input type="submit" name="delete-project">
+</form>
+
+
 </html>

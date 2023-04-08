@@ -104,8 +104,7 @@ $accountType = getAccountType($conn, $empNo);
 
         <div class="container-fluid page-body-wrapper">
 
-            <!-- partial:includes/_settings-panel.html -->
-            <?php include "../includes/_settings-panel.php"; ?>
+    
 
             <!-- partial:includes/_adminsidebar.php -->
             <?php include '../includes/_adminsidebar.php'; ?>

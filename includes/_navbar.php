@@ -1,5 +1,6 @@
 <!-- partial:/_navbar.php
 <?php
+// Start the session
 session_start();
 if (isset($_POST['logout'])) {
     // Unset all of the session variables
@@ -13,6 +14,7 @@ if (isset($_POST['logout'])) {
 }
 ?> -->
 
+<!-- HTML code for the navbar -->
 <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
     <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
         <a class="navbar-brand brand-logo mr-5" href="../dashboard.php"><img src="../images/logo.svg" class="mr-2" alt="logo" /></a>
@@ -23,10 +25,8 @@ if (isset($_POST['logout'])) {
             <span class="icon-menu"></span>
         </button>
         <ul class="navbar-nav navbar-nav-right">
-
-
+            <!-- HTML code for the profile dropdown -->
             <li class="nav-item nav-profile dropdown">
-
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-toggle="dropdown" id="profileDropdown">
                     <div class="profile-text pr-3" style="line-height: 1.2em;">
                         <p class="mb-0" style="margin-bottom: 0;"><?php echo $firstName . " " . $lastName; ?></p>
@@ -34,22 +34,6 @@ if (isset($_POST['logout'])) {
                     </div>
                     <img src="../images/faces/face28.jpg" alt="profile" />
                 </a>
-
-
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
-                    <a class="dropdown-item">
-                        <i class="ti-user text-primary"></i>
-                        My Profile
-                    </a>
-                    <a class="dropdown-item">
-                        <i class="ti-settings text-primary"></i>
-                        Settings
-                    </a>
-                    <a class="dropdown-item" href="/index.php">
-                        <i class="ti-power-off text-primary"></i>
-                        Logout
-                    </a>
-                </div>
             </li>
 
             <!-- HTML code for the logout button -->
@@ -73,12 +57,6 @@ if (isset($_POST['logout'])) {
                     window.location.href = rootUrl;
                 }
             </script>
-
         </ul>
-
-        <!-- <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
-            <span class="icon-menu"></span>
-        </button> -->
-
     </div>
 </nav>

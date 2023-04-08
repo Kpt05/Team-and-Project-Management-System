@@ -58,20 +58,21 @@ $projectLead = $_POST['projectLead']; // DONT USE THIS - JUST TO HELP
 $projectLeadID = $_POST['projectLeadID'];
 $projectTeamID = $_POST['projectTeamID'];
 
-$projectID = "PROJ" . $random_str . substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 4); // Concatenates "PROJ" with the random string and another random string of 4 characters to generate the project ID
+$projectID = "PROD" . substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 4); // Concatenates "PROD" with a random string of 4 characters to generate the project ID
 
 while (true) {
     $sql_check = "SELECT * FROM Projects WHERE projectID = '$projectID'";
     $result_check = mysqli_query($conn, $sql_check);
     if (mysqli_num_rows($result_check) > 0) {
-        // If a project record with the generated projectID already exists, generate a new random string and concatenate it with the department value to generate a new projectID
+        // If a project record with the generated projectID already exists, generate a new random string and concatenate it with "PROD" to generate a new projectID
         $random_str = substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 4);
-        $projectID = "PROJ" . $random_str . substr(str_shuffle("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 4); // Concatenates "PROJ" with the random string and another random string of 4 characters to generate the project ID
+        $projectID = "PROD" . $random_str; // Concatenates "PROD" with the random string to generate the project ID
     } else {
-        // If no team record with the generated teamID exists, insert the new team record into the Teams table
+        // If no project record with the generated projectID exists, insert the new project record into the Projects table
         break;
     }
 }
+
 
 
 $userID = $_POST['userID'];

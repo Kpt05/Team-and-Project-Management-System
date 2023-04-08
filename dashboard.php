@@ -1,10 +1,11 @@
-<!--
-PHP intergration
--->
+<!--Created by Kevin Titus on 2022-07-19.-->
+<!-- PHP intergration -->
 <?php
+// Including functions.inc.php to use functions and dbconfig.php to connect to the database
 require_once('includes/functions.inc.php');
 $conn = require 'includes/dbconfig.php';
 
+// Start session
 session_start();
 $empNo = $_SESSION['empNo'];
 $firstName = getFirstName($conn, $empNo);
@@ -12,30 +13,41 @@ $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
 
 // Count number of admins
-$sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Administrator'";
+$sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Administrator'"; // SQL query to count number of admins
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $admin_count = $row['count'];
 
 // Count number of managers
-$sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Manager'";
+$sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Manager'"; // Query to count number of managers
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $manager_count = $row['count'];
 
 // Count number of employees
-$sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Employee'";
+$sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Employee'"; // Query to count number of employees
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $employee_count = $row['count'];
 
-$total_users = $admin_count + $manager_count + $employee_count;
+$total_users = $admin_count + $manager_count + $employee_count; // Total number of users
 
+// Query to retrieve data from Reports table, including tasksCompleted, hoursWorked, and userID
+$sql = "SELECT tasksCompleted, hoursWorked, userID FROM Reports";
+$result = $conn->query($sql);
+
+// Create a 3D array to store the data for the chart
+$data = array();
+while ($row = $result->fetch_assoc()) {
+    $efficiencyRate = ($row['tasksCompleted'] / $row['hoursWorked']) * 100; // Calculate efficiency rate
+    $userSql = "SELECT CONCAT(firstName, ' ', lastName) AS fullName FROM Users WHERE userID = " . $row['userID']; // Query to retrieve full name of user
+    $userResult = $conn->query($userSql); 
+    $userRow = $userResult->fetch_assoc();
+    $fullName = $userRow['fullName'];
+    $data[] = array($fullName, $efficiencyRate); // Add data to array
+}
 ?>
 
-
-
-<!--Created by Kevin Titus on 2022-07-19.-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -43,7 +55,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>My Dashboard | Source Tech Portal</title>
+    <title>My Dashboard | Source Tech Portal</title> <!-- Page title -->
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/feather/feather.css" />
     <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" />
@@ -51,19 +63,18 @@ $total_users = $admin_count + $manager_count + $employee_count;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-
-    <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
     <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css" />
     <!-- End plugin css for this page -->
-    <!-- inject:css -->
+   
     <link rel="stylesheet" href="css/vertical-layout-light/style.css" />
     <!-- endinject -->
     <link rel="shortcut icon" href="images/favicon.ico" />
 </head>
 
+<!-- Loader Styling -->
 <style>
     * {
         margin: 0;
@@ -96,22 +107,19 @@ $total_users = $admin_count + $manager_count + $employee_count;
 </style>
 
 <body>
-
-    <div class="loader">
+<!-- Loader --> 
+    <div class="loader"> 
         <img src="images/loader.gif" alt="" />
     </div>
 
     <div class="container-scroller">
 
         <!-- partial:includes/_navbar.php -->
-        <?php include "includes/_navbar.php"; ?>
-
+        <?php include "includes/_navbar.php"; ?> <!-- This will use the navbar partial and include it on the dasboard.php page -->
 
         <div class="container-fluid page-body-wrapper">
 
-            <!-- partial:includes/_settings-panel.html -->
-            <?php include "includes/_settings-panel.php"; ?>
-
+            
             <!-- partial - Account Type Based Navbar -->
             <?php
             if ($accountType == 'Employee') {
@@ -130,10 +138,10 @@ $total_users = $admin_count + $manager_count + $employee_count;
                         <div class="col-md-12 grid-margin">
                             <div class="row">
                                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-                                    <h2 class="font-weight-bold">Dashboard</h2>
+                                    <h2 class="font-weight-bold">Dashboard</h2> <!-- Page title -->
 
                                     <h4 class="font-weight-bold mb-0">
-                                        Welcome, <?php echo $firstName ?>
+                                        Welcome, <?php echo $firstName ?> <!-- Welcome message -->
                                     </h4>
 
                                 </div>
@@ -150,7 +158,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                         <div class="d-flex">
                                             <div>
                                                 <h2 class="mb-0 font-weight-normal">
-                                                    <i class="icon-cloud mr-2"></i><span id="temp"></span><sup>C</sup>
+                                                    <i class="icon-cloud mr-2"></i><span id="temp"></span><sup>C</sup> <!-- Uses the openweathermap API to display the current temperature in Yeovil -->
                                                 </h2>
                                             </div>
                                             <div class="ml-2">
@@ -163,15 +171,16 @@ $total_users = $admin_count + $manager_count + $employee_count;
                             </div>
                         </div>
 
+                        <!-- OpenWeatherMap API -->
                         <script>
-                            const apiKey = "6abe60b89e524acc551948f8a204b452";
+                            const apiKey = "6abe60b89e524acc551948f8a204b452"; // API Key
                             const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Yeovil,uk&units=metric&appid=${apiKey}`;
 
                             fetch(apiUrl)
                                 .then(response => response.json())
                                 .then(data => {
                                     const tempElement = document.getElementById("temp");
-                                    tempElement.textContent = Math.round(data.main.temp);
+                                    tempElement.textContent = Math.round(data.main.temp); // Displays the current temperature in Yeovil
                                 })
                                 .catch(error => console.log(error));
                         </script>
@@ -185,7 +194,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                         </div>
                                         <div class="col-md-6">
                                             <div class="chart-legend">
-                                                <h4 style="font-size: 24px; margin-bottom: 30px;">Active User Accounts</h4>
+                                                <h4 style="font-size: 24px; margin-bottom: 30px;">Active User Accounts</h4> <!-- Displays the number of active user accounts -->
                                                 <?php
                                                 $user_types = array(
                                                     'Admins' => $admin_count,
@@ -193,6 +202,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                                     'Employees' => $employee_count
                                                 );
 
+                                                // Calculate the total number of users
                                                 $total_users = array_sum($user_types);
                                                 foreach ($user_types as $user_type => $count) {
                                                     $percent = round($count / $total_users * 100, 2);
@@ -207,6 +217,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
                             </div>
                         </div>
 
+                        <!-- Chart.js implementation -->
                         <script>
                             var ctx = document.getElementById('myPieChart').getContext('2d');
                             var myPieChart = new Chart(ctx, {
@@ -241,95 +252,86 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                 }
                             });
                         </script>
-
                     </div>
 
 
                     <div class="row">
 
-                        <div class="row">
-                            <div class="col-md-5 grid-margin stretch-card">
-
-                                <div class="card">
-                                    <div class="card-body">
-                                        <p class="card-title mb-0">Top Products</p>
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-borderless">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Product</th>
-                                                        <th>Price</th>
-                                                        <th>Date</th>
-                                                        <th>Status</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td>Search Engine Marketing</td>
-                                                        <td class="font-weight-bold">$362</td>
-                                                        <td>21 Sep 2018</td>
-                                                        <td class="font-weight-medium">
-                                                            <div class="badge badge-success">Completed</div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Search Engine Optimization</td>
-                                                        <td class="font-weight-bold">$116</td>
-                                                        <td>13 Jun 2018</td>
-                                                        <td class="font-weight-medium">
-                                                            <div class="badge badge-success">Completed</div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Display Advertising</td>
-                                                        <td class="font-weight-bold">$551</td>
-                                                        <td>28 Sep 2018</td>
-                                                        <td class="font-weight-medium">
-                                                            <div class="badge badge-warning">Pending</div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Pay Per Click Advertising</td>
-                                                        <td class="font-weight-bold">$523</td>
-                                                        <td>30 Jun 2018</td>
-                                                        <td class="font-weight-medium">
-                                                            <div class="badge badge-warning">Pending</div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>E-Mail Marketing</td>
-                                                        <td class="font-weight-bold">$781</td>
-                                                        <td>01 Nov 2018</td>
-                                                        <td class="font-weight-medium">
-                                                            <div class="badge badge-danger">Cancelled</div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Referral Marketing</td>
-                                                        <td class="font-weight-bold">$283</td>
-                                                        <td>20 Mar 2018</td>
-                                                        <td class="font-weight-medium">
-                                                            <div class="badge badge-warning">Pending</div>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Social media marketing</td>
-                                                        <td class="font-weight-bold">$897</td>
-                                                        <td>26 Oct 2018</td>
-                                                        <td class="font-weight-medium">
-                                                            <div class="badge badge-success">Completed</div>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-
+                        <!-- Chart to display the efficiency rate of each user -->
+                        <div class="col-md-8 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Efficiency Rate by User</h4>
+                                    <h6 class="card-subtitle mb-2 text-muted">Efficiency Rate = (Number of Tasks Completed / Total Hours Worked) * 100</h6>
+                                    <canvas id="efficiencyChart"></canvas>
                                 </div>
-
                             </div>
+                        </div>
 
-                            <div class="col-md-5 grid-margin stretch-card">
+
+                        <!-- Script to create the chart using Charts.js -->
+                        <script>
+                            // Get the data from the PHP array
+                            var data = <?php echo json_encode($data); ?>;
+
+                            // Function to perform bubble sort on the data array by efficiency rate in ascending order
+                            function bubbleSort(arr) {
+                                var len = arr.length;
+                                for (var i = 0; i < len - 1; i++) {
+                                    for (var j = 0; j < len - i - 1; j++) {
+                                        if (arr[j][1] > arr[j + 1][1]) {
+                                            var temp = arr[j];
+                                            arr[j] = arr[j + 1];
+                                            arr[j + 1] = temp;
+                                        }
+                                    }
+                                }
+                                return arr;
+                            }
+
+                            // Sort the data array by efficiency rate in ascending order using bubble sort
+                            data = bubbleSort(data);
+
+                            // Extract the full names and efficiency rates from the sorted data array
+                            var labels = data.map(function(item) {
+                                return item[0];
+                            });
+                            var efficiencyRates = data.map(function(item) {
+                                return item[1];
+                            });
+
+                            // Create a chart using Charts.js
+                            var ctx = document.getElementById('efficiencyChart').getContext('2d');
+                            var chart = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: labels,
+                                    datasets: [{
+                                        label: 'Efficiency Rate',
+                                        data: efficiencyRates,
+                                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Set the color for the bars
+                                        borderColor: 'rgba(75, 192, 192, 1)', // Set the border color for the bars
+                                        borderWidth: 1 // Set the border width for the bars
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        x: {
+                                            beginAtZero: true,
+                                            max: 100 // Set the maximum value for the x-axis to 100
+                                        },
+                                        y: {
+                                            beginAtZero: true,
+                                            max: 100 // Set the maximum value for the y-axis to 100
+                                        }
+                                    }
+                                }
+                            });
+                        </script>
+
+                        <!-- To do list -->
+                        <div class="row">
+                            <div class="col-md-12 grid-margin stretch-card">
                                 <div class="card">
                                     <div class="card-body">
                                         <h4 class="card-title">To Do Lists</h4>
@@ -339,7 +341,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                                     <div class="form-check form-check-flat">
                                                         <label class="form-check-label">
                                                             <input class="checkbox" type="checkbox" />
-                                                            Meeting with Urban Team
+                                                            Meeting with Tech Team
                                                         </label>
                                                     </div>
                                                     <i class="remove ti-close"></i>
@@ -348,7 +350,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                                     <div class="form-check form-check-flat">
                                                         <label class="form-check-label">
                                                             <input class="checkbox" type="checkbox" checked />
-                                                            Duplicate a project for new customer
+                                                            Add new employees to the team
                                                         </label>
                                                     </div>
                                                     <i class="remove ti-close"></i>
@@ -357,7 +359,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                                     <div class="form-check form-check-flat">
                                                         <label class="form-check-label">
                                                             <input class="checkbox" type="checkbox" />
-                                                            Project meeting with CEO
+                                                            Project meeting with client
                                                         </label>
                                                     </div>
                                                     <i class="remove ti-close"></i>
@@ -366,7 +368,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                                     <div class="form-check form-check-flat">
                                                         <label class="form-check-label">
                                                             <input class="checkbox" type="checkbox" checked />
-                                                            Follow up of team zilla
+                                                            Follow up of team projects
                                                         </label>
                                                     </div>
                                                     <i class="remove ti-close"></i>
@@ -375,7 +377,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                                     <div class="form-check form-check-flat">
                                                         <label class="form-check-label">
                                                             <input class="checkbox" type="checkbox" />
-                                                            Level up for Antony
+                                                            Project meeting with boss
                                                         </label>
                                                     </div>
                                                     <i class="remove ti-close"></i>
@@ -390,20 +392,12 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                         </div>
                                     </div>
                                 </div>
-
-
                             </div>
                         </div>
                     </div>
-
-
-                    <!-- content-wrapper ends -->
-
                     <!-- partial:includes/_footer.php -->
                     <?php include("includes/_footer.php"); ?>
                     <!-- partial -->
-
-
                 </div>
                 <!-- main-panel ends -->
             </div>
@@ -433,6 +427,7 @@ $total_users = $admin_count + $manager_count + $employee_count;
         <script src="js/Chart.roundedBarCharts.js"></script>
         <!-- End custom js for this page-->
 
+        <!-- loader script -->
         <script>
             var loader = document.querySelector(".loader")
 
@@ -443,9 +438,5 @@ $total_users = $admin_count + $manager_count + $employee_count;
             }
         </script>
 
-
-
-
 </body>
-
 </html>

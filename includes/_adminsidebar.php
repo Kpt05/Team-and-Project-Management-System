@@ -4,25 +4,26 @@
         <li class="nav-item">
             <a class="nav-link" href="../dashboard.php">
                 <i class="icon-grid menu-icon"></i>
-                <span class="menu-title">Dashboard</span>
+                <span class="menu-title">Dashboard</span> <!-- Dashboard -->
             </a>
         </li>
-
+    
+        <!-- List of links to other pages -->
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#ui-basic" aria-expanded="false" aria-controls="ui-basic">
                 <i class="icon-paper menu-icon"></i>
-                <span class="menu-title">Manage Projects</span>
+                <span class="menu-title">Manage Projects</span> <!-- Manage Projects Page-->
                 <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="ui-basic">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="../projects/viewProjects.php">
+                        <a class="nav-link" href="../projects/viewProjects.php"> <!-- View Projects Page-->
                             View Projects
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../projects/createProjects.php">
+                        <a class="nav-link" href="../projects/createProjects.php"> <!-- Create a Project Page -->
                             Create a Project
                         </a>
                     </li>
@@ -33,18 +34,18 @@
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#form-elements" aria-expanded="false" aria-controls="form-elements">
                 <i class="icon-head menu-icon"></i>
-                <span class="menu-title">System Users</span>
+                <span class="menu-title">System Users</span> <!-- System Users Page -->
                 <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="form-elements">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="../system_users/ViewSystemUsers.php">
+                        <a class="nav-link" href="../system_users/ViewSystemUsers.php"> <!-- View System Users Page -->
                             View System Users
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../system_users/CreateSystemUser.php">
+                        <a class="nav-link" href="../system_users/CreateSystemUser.php"> <!-- Add System User Page -->
                             Add System User
                         </a>
                     </li>
@@ -55,17 +56,17 @@
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
                 <i class="icon-briefcase menu-icon"></i>
-                <span class="menu-title">My Teams</span>
+                <span class="menu-title">My Teams</span> <!-- My Teams Page -->
                 <i class="menu-arrow"></i>
             </a>
             <div class="collapse" id="tables">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="../teams/viewTeam.php">
+                        <a class="nav-link" href="../teams/viewTeam.php"> <!-- View Teams Page -->
                             View Teams</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../teams/createTeam.php">
+                        <a class="nav-link" href="../teams/createTeam.php"> <!-- Create a Team Page -->
                             Create a Team</a>
                     </li>
                 </ul>
@@ -81,10 +82,10 @@
             <div class="collapse" id="icons">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="../pages/icons/mdi.html">Active Approvals</a>
+                        <a class="nav-link" href="../pages/icons/mdi.html">Active Approvals</a> <!-- Active Approvals Page -->
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../pages/icons/mdi.html">Complete Approvals</a>
+                        <a class="nav-link" href="../pages/icons/mdi.html">Complete Approvals</a> <!-- Complete Approvals Page -->
                     </li>
                 </ul>
             </div>
@@ -99,12 +100,12 @@
             <div class="collapse" id="auth">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="../reports/project_reports.php">
+                        <a class="nav-link" href="../reports/project_reports.php"> <!-- Project Reports Page -->
                             Project Reports
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="../reports/user_reports.php">
+                        <a class="nav-link" href="../reports/user_reports.php"> <!-- User Reports Page -->
                             User Reports
                         </a>
                     </li>
