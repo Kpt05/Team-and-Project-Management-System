@@ -136,6 +136,9 @@ $result = mysqli_query($conn, $sql);
                             <a href="createSystemUser.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
                                 <i class="bi bi-person-plus" style="font-size: 1.5rem; color: #375577;"></i>
                             </a>
+                            <a href="userPerformance.php" class="btn btn-link text-decoration-none text-reset" id="team-performance">
+                                <i class="bi bi-award" style="font-size: 1.5rem; color: #375577;"></i>
+                            </a>
                             <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-user" style="opacity: 0.5; pointer-events: none;">
                                 <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
                             </button>

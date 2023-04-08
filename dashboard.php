@@ -176,67 +176,71 @@ $total_users = $admin_count + $manager_count + $employee_count;
                                 .catch(error => console.log(error));
                         </script>
 
-<div class="col-md-6 grid-margin stretch-card">
-  <div class="card position-relative">
-    <div class="card-body">
-      <div class="row">
-        <div class="col-md-6">
-          <canvas id="myPieChart"></canvas>
-        </div>
-        <div class="col-md-6">
-          <div class="chart-legend">
-            <h4 style="font-size: 24px; margin-bottom: 30px;">Active User Accounts</h4>
-            <?php
-              $admin_percent = round($admin_count / $total_users * 100, 2);
-              $manager_percent = round($manager_count / $total_users * 100, 2);
-              $employee_percent = round($employee_count / $total_users * 100, 2);
-            ?>
-            <p style="font-size: 20px; margin-bottom: 35px;">Admins: <?php echo $admin_count; ?> (<?php echo $admin_percent; ?>%)</p>
-            <p style="font-size: 20px; margin-bottom: 35px;">Managers: <?php echo $manager_count; ?> (<?php echo $manager_percent; ?>%)</p>
-            <p style="font-size: 20px; margin-bottom: 45px;">Employees: <?php echo $employee_count; ?> (<?php echo $employee_percent; ?>%)</p>
-            <p style="font-size: 20px; margin-bottom: 0;">Total Users: <?php echo $total_users; ?></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+                        <div class="col-md-6 grid-margin stretch-card">
+                            <div class="card position-relative">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <canvas id="myPieChart"></canvas>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="chart-legend">
+                                                <h4 style="font-size: 24px; margin-bottom: 30px;">Active User Accounts</h4>
+                                                <?php
+                                                $user_types = array(
+                                                    'Admins' => $admin_count,
+                                                    'Managers' => $manager_count,
+                                                    'Employees' => $employee_count
+                                                );
 
-<script>
-var ctx = document.getElementById('myPieChart').getContext('2d');
-var myPieChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-        labels: ['Admins', 'Managers', 'Employees'],
-        datasets: [{
-            data: [<?php echo $admin_count; ?>, <?php echo $manager_count; ?>, <?php echo $employee_count; ?>],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.7)',
-                'rgba(54, 162, 235, 0.7)',
-                'rgba(255, 206, 86, 0.7)'
-            ],
-            borderColor: [
-                'rgba(255, 99, 132, 1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        legend: {
-            position: 'right',
-            align: 'end',
-            labels: {
-                fontColor: 'black'
-            }
-        }
-    }
-});
-</script>
+                                                $total_users = array_sum($user_types);
+                                                foreach ($user_types as $user_type => $count) {
+                                                    $percent = round($count / $total_users * 100, 2);
+                                                    echo "<p style='font-size: 20px; margin-bottom: 35px;'>{$user_type}: {$count} ({$percent}%)</p>";
+                                                }
+                                                ?>
+                                                <p style="font-size: 20px; margin-bottom: 0;">Total Users: <?php echo $total_users; ?></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
+                        <script>
+                            var ctx = document.getElementById('myPieChart').getContext('2d');
+                            var myPieChart = new Chart(ctx, {
+                                type: 'pie',
+                                data: {
+                                    labels: <?php echo json_encode(array_keys($user_types)); ?>,
+                                    datasets: [{
+                                        data: <?php echo json_encode(array_values($user_types)); ?>,
+                                        backgroundColor: [
+                                            'rgba(255, 99, 132, 0.7)',
+                                            'rgba(54, 162, 235, 0.7)',
+                                            'rgba(255, 206, 86, 0.7)'
+                                        ],
+                                        borderColor: [
+                                            'rgba(255, 99, 132, 1)',
+                                            'rgba(54, 162, 235, 1)',
+                                            'rgba(255, 206, 86, 1)'
+                                        ],
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    legend: {
+                                        position: 'right',
+                                        align: 'end',
+                                        labels: {
+                                            fontColor: 'black'
+                                        }
+                                    }
+                                }
+                            });
+                        </script>
 
                     </div>
 

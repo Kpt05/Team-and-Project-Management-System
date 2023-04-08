@@ -281,36 +281,35 @@ $accountType = getAccountType($conn, $empNo);
                                                                         <input type="text" class="form-control" id="empNo" placeholder="Enter a 13 digit number" pattern="[0-9]{13}" name="empNo" required>
                                                                     </div>
 
+                                                                    
                                                                     <div class="form-group">
-                                                                        <label for="teams">
-                                                                            Search Teams <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="teams" name="teams" placeholder="Search Teams" list="teamList" required />
+                                                                    <label for="teams">Team ID: <span style="color: red;">*</span></label>
+                                                                    <input type="text" class="form-control" id="teams" name="teams" placeholder="Search for a team ID" list="teamList1" required>
 
-                                                                        <datalist id="teamList">
-                                                                            <option value="Team 1">
-                                                                            <option value="Team 2">
-                                                                            <option value="Team 3">
-                                                                                <!-- Add more options for each team -->
-                                                                        </datalist>
-                                                                    </div>
+                                                                    <datalist id="teamList1">
+                                                                        <?php
+                                                                        // Query the teams table to get all teamIDs
+                                                                        $sql = "SELECT teamID FROM Teams";
+                                                                        $result = mysqli_query($conn, $sql);
 
+                                                                        // Loop through the query results and display them as options in the datalist
+                                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                                            echo "<option value='" . $row["teamID"] . "'>";
+                                                                        }
+                                                                        ?>
+                                                                    </datalist>
 
                                                                     <script>
-                                                                        const searchField = document.getElementById("teamSearch");
-                                                                        const optionsList = document.querySelectorAll("#teamList option");
-
-                                                                        searchField.addEventListener("input", function() {
-                                                                            let options = "";
-                                                                            optionsList.forEach(function(option) {
-                                                                                if (option.value.toLowerCase().includes(searchField.value.toLowerCase())) {
-                                                                                    options += "<option value='" + option.value + "'>" + option.value + "</option>";
-                                                                                }
-                                                                            });
-                                                                            searchField.setAttribute("list", "teamList");
-                                                                            document.getElementById("teamList").innerHTML = options;
+                                                                        // Listen for changes on the datalist input
+                                                                        document.getElementById("teamID").addEventListener("input", function() {
+                                                                            // Get the selected option and set the hidden input value to the corresponding data-value attribute
+                                                                            var option = document.querySelector("#teamList1 option[value='" + this.value + "']");
+                                                                            if (option) {
+                                                                                document.getElementById("teamID").value = option.value;
+                                                                            }
                                                                         });
                                                                     </script>
+                                                                </div>
 
                                                                     <div class="form-group">
                                                                         <label class="label" for="email">Email <span style="color: red;">*</span></label>

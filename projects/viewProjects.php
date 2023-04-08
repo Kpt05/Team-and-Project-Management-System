@@ -25,15 +25,10 @@ $sql = "SELECT * FROM Users";
 // Execute the query and get the result set
 $result = mysqli_query($conn, $sql);
 
-$sql = "SELECT * FROM Teams";
+$sql = "SELECT * FROM Projects";
 $result = mysqli_query($conn, $sql);
 
 ?>
-
-
-
-
-
 
 <!--Created by Kevin Titus on 2022-07-19.-->
 <!DOCTYPE html>
@@ -68,7 +63,6 @@ $result = mysqli_query($conn, $sql);
     <!-- Data Table JS
 		============================================ -->
     <link rel="stylesheet" href="../css/jquery.dataTables.min.css" />
-
 
 </head>
 
@@ -223,7 +217,7 @@ $result = mysqli_query($conn, $sql);
                                 <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
                             </button>
                             <button type="button" class="btn btn-link text-decoration-none text-reset" id="delete-user" style="opacity: 0.5; pointer-events: none;">
-                                <i class="bi bi-trash3" style="font-size: 1.5rem; color: #375577;"></i>
+                                <i class="bi bi-trash2" style="font-size: 1.5rem; color: #375577;"></i>
                             </button>
                         </div>
                     </div>
@@ -237,10 +231,10 @@ $result = mysqli_query($conn, $sql);
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo '<div class="team-card">';
                                         echo '<div class="team-pic" style="background-image: url(' . $row["team_pic"] . ');"></div>';
-                                        echo '<div class="team-name">' . $row["teamName"] . '</div>';
-                                        echo '<div class="team-info">Team ID: ' . $row["teamID"] . '</div>';
-                                        echo '<div class="team-info">Department: ' . $row["department"] . '</div>';
-                                        echo '<div class="team-info">Team Lead: ' . $row["teamLead"] . '</div>';
+                                        echo '<div class="team-name">' . $row["projectName"] . '</div>';
+                                        echo '<div class="team-info">Project ID: ' . $row["projectID"] . '</div>';
+                                        echo '<div class="team-info">Status: ' . $row["projectStatus"] . '</div>';
+                                        echo '<div class="team-info">Team Lead: ' . $row["projectLeadID"] . '</div>';
                                         echo '<div class="team-info">Contact Email: ' . $row["teamID"] . '</div>';
                                         echo '</div>';
                                     }

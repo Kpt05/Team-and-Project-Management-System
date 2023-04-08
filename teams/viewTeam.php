@@ -212,22 +212,26 @@ $result = mysqli_query($conn, $sql);
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <h2 class="font-weight-bold">View Teams</h2>
-                        </div>
-                        <div class="col-md-4 text-md-right">
-                            <a href="createTeam.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
-                                <i class="bi bi-plus" style="font-size: 1.5rem; color: #375577;"></i>
-                            </a>
-                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-user" style="opacity: 0.5; pointer-events: none;">
-                                <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
-                            </button>
-                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="delete-user" style="opacity: 0.5; pointer-events: none;">
-                                <i class="bi bi-trash3" style="font-size: 1.5rem; color: #375577;"></i>
-                            </button>
-                        </div>
-                    </div>
+                <div class="row">
+    <div class="col-md-8">
+        <h2 class="font-weight-bold">View Teams</h2>
+    </div>
+    <div class="col-md-4 text-md-right">
+        <a href="createTeam.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
+            <i class="bi bi-plus" style="font-size: 1.5rem; color: #375577;"></i>
+        </a>
+        <a href="teamPerformance.php" class="btn btn-link text-decoration-none text-reset" id="team-performance">
+            <i class="bi bi-award" style="font-size: 1.5rem; color: #375577;"></i>
+        </a>
+        <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-user" style="opacity: 0.5; pointer-events: none;">
+            <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
+        </button>
+        <button type="button" class="btn btn-link text-decoration-none text-reset" id="delete-user" style="opacity: 0.5; pointer-events: none;">
+            <i class="bi bi-trash3" style="font-size: 1.5rem; color: #375577;"></i>
+        </button>
+    </div>
+</div>
+
 
                     <div class="row mt-4">
                         <div class="col-lg-12 grid-margin stretch-card">

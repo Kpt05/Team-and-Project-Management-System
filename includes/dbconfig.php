@@ -1,5 +1,5 @@
 <?php
-
+// Path: includes/dbconfig.php
 $host = "localhost";
 $dbname = "Source_Tech";
 $dbusername = "root";

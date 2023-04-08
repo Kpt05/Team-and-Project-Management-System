@@ -9,12 +9,9 @@ $conn = require '../includes/dbconfig.php';
 session_start();
 $empNo = $_SESSION['empNo'];
 $firstName = getFirstName($conn, $empNo);
-$user_id = getUserId($conn, $empNo);
+$userID = getUserId($conn, $empNo);
 $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
-
-
-
 ?>
 
 <!--Created by Kevin Titus on 2022-07-21.-->
@@ -116,54 +113,48 @@ $accountType = getAccountType($conn, $empNo);
 
             <!-- partial -->
             <div class="main-panel">
+
                 <div class="content-wrapper">
-                  
+                    <div class="row">
+                        <div class="col-md-12 grid-margin">
+                            <div class="row justify-content-center">
+                                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                                    <h2 class="font-weight-bold">Clockings</h2>
+                                </div>
+                                <div class="col-12 col-xl-4 text-right font-weight-bold" style="font-size: 23px; margin-top: 20px; margin-right: -50px; text-align: right;">
+                                    <div class="text-center">
+                                        <?php
+                                        $date = date('l, j M');
+                                        $time = date('H:i');
+                                        echo "<div>$date</div>";
+                                        echo "<div>$time</div>";
+
+                                        // get user status
+                                        $status = getUserStatus($conn, $userID);
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row justify-content-center mt-4">
+                                <div class="col-12 col-xl-8 text-center font-weight-bold">
+                                    <div style="font-size: 40px; font-weight: bold;"><?php echo $status; ?></div>
 
 
 
 
-
-
-
-                <div class="row">
-    <div class="col-md-12 grid-margin">
-        <div class="row justify-content-center">
-            <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-                <h2 class="font-weight-bold">Clockings</h2>
-            </div>
-            <div class="col-12 col-xl-4 text-right font-weight-bold" style="font-size: 23px; margin-top: 20px; margin-right: -50px; text-align: right;">
-                <div class="text-center">
-                    <?php
-                    $date = date('l, j M');
-                    $time = date('H:i');
-                    echo "<div>$date</div>";
-                    echo "<div>$time</div>";
-
-                    // get user status
-                    $status = getUserStatus($conn, $userID);
-                    ?>
-                </div>
-            </div>
-        </div>
-        <div class="row justify-content-center mt-4">
-            <div class="col-12 col-xl-8 text-center font-weight-bold">
-                <div style="font-size: 40px; font-weight: bold;"><?php echo $status; ?></div>
-            </div>
-        </div>
-        <!-- content-wrapper ends -->
-        <!-- partial:includes/_footer.php -->
-        <?php include("../includes/_footer.php"); ?>
-        <!-- partial -->
-    </div>
-    <!-- main-panel ends -->
-</div>
-
-
-
-
-
+                                </div>
+                            </div>
+                            <!-- content-wrapper ends -->
+                            <!-- partial:includes/_footer.php -->
+                            <?php include("../includes/_footer.php"); ?>
+                            <!-- partial -->
+                        </div>
+                        <!-- main-panel ends -->
+                    </div>
                     <!-- page-body-wrapper ends -->
                 </div>
+
                 <!-- container-scroller -->
 
                 <!-- plugins:js -->
@@ -206,7 +197,5 @@ $accountType = getAccountType($conn, $empNo);
 
 
 </body>
-
-
 
 </html>

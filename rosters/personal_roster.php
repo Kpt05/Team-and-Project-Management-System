@@ -1,3 +1,22 @@
+<!--
+PHP intergration
+-->
+<?php
+require_once('../includes/functions.inc.php');
+$conn = require '../includes/dbconfig.php';
+
+session_start();
+$empNo = $_SESSION['empNo'];
+$firstName = getFirstName($conn, $empNo);
+$lastName = getLastName($conn, $empNo);
+$accountType = getAccountType($conn, $empNo);
+
+
+
+
+
+?>
+
 <!--Created by Kevin Titus on 2022-07-21.-->
 <!DOCTYPE html>
 <html lang="en">
@@ -18,17 +37,18 @@
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" type="text/css" href="../js/select.dataTables.min.css" />
 
-    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css' />
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js'></script>
-
-
-
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css" />
     <!-- endinject -->
     <link rel="shortcut icon" href="../images/favicon.ico" />
+
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+
 
 </head>
 
@@ -86,31 +106,15 @@
                 <div class="content-wrapper">
                     <div class="row">
                         <div class="col-md-12 grid-margin">
+
+
+
                             <div class="row">
                                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
                                     <h2 class="font-weight-bold">Personal Roster</h2>
                                 </div>
                                 <div class="row"></div>
-                                <div class="col-lg-12 grid-margin stretch-card">
-                                    <div class="card">
-                                        <div class="card-body">
-
-                                            <!-- Add Full Calendar here -->
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-lg-12 grid-margin stretch-card">
-                                    <div class="card">
-                                        <div class="card-body">
-
-                                            <!-- Add Full Calendar here -->
-
-                                        </div>
-                                    </div>
-                                </div>
-
+                               
                             </div>
 
 

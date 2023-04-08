@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Source Tech Portal</title>
+    <title>Source Tech Portal</title> <!-- Title of the page -->
 
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
@@ -16,7 +16,7 @@
     <style>
         /* Style the video: 100% width and height to cover the entire window */
         #myVideo {
-            position: fixed;
+            position: fixed; 
             z-index: -1;
 
             /*right: 0;
@@ -46,7 +46,7 @@
             }
 
             body {
-                background-image: url("images/bg.png");
+                background-image: url("images/bg.png"); 
                 background-size: cover;
                 background-repeat: no-repeat;
             }
@@ -95,8 +95,8 @@
 
 <body>
     <div id="main-wrapper">
-        <video id="myVideo" poster="images/bg.png" autoplay muted loop>
-            <source src="images/bgVid.mp4" type="video/mp4">
+        <video id="myVideo" poster="images/bg.png" autoplay muted loop> <!-- If the screen ratio is below 16:9, the video will be hidden and the background image will be displayed instead -->
+            <source src="images/bgVid.mp4" type="video/mp4"> <!-- Path to the video file -->
         </video>
 
         <section class="ftco-section">
@@ -113,21 +113,21 @@
                             <div class="login-wrap p-4 p-md-5">
                                 <div class="d-flex">
                                     <div class="w-100">
-                                        <h3 class="mb-2"><b style="color: #375577">Welcome to Source Tech</b></h3>
+                                        <h3 class="mb-2"><b style="color: #375577">Welcome to Source Tech</b></h3> <!-- Welcome message -->
                                     </div>
                                 </div>
 
-                                <form action="includes/login.inc.php" method="POST" class="signin-form">
+                                <form action="includes/login.inc.php" method="POST" class="signin-form">   <!-- Path to the login.inc.php file (Contains the login handling code) -->
 
                                     <div class="form-group mb-3">
-                                        <label class="label" for="Email">Email</label>
-                                        <input type="email" class="form-control" placeholder="john.appleseed@sourcetech.net" required name="email" id="email" />
+                                        <label class="label" for="Email">Email</label> <!-- Email label -->
+                                        <input type="email" class="form-control" placeholder="john.appleseed@sourcetech.net" required name="email" id="email" /> <!-- Email input -->
                                     </div>
 
                                     <div class="form-group mb-3">
-                                        <label class="label" for="Password">Password</label>
+                                        <label class="label" for="Password">Password</label> <!-- Password label -->
                                         <div class="position-relative">
-                                            <input type="password" class="form-control pr-5" placeholder="Password" required name="password" id="password" />
+                                            <input type="password" class="form-control pr-5" placeholder="Password" required name="password" id="password" /> <!-- Password input -->
                                             <span class="position-absolute top-50 translate-middle-y" style="right: 15px; top: 10px;" id="password-toggle">
                                                 <i class="fa fa-eye"></i>
                                             </span>
@@ -135,8 +135,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <button type="submit" name="submit" class="form-control btn btn-primary rounded submit px-3">Log in
-                                        </button>
+                                        <button type="submit" name="submit" class="form-control btn btn-primary rounded submit px-3">Log in </button> <!-- Login button -->
                                     </div>
 
                                     <div class="form-group d-md-flex">
@@ -146,7 +145,7 @@
                                             </label>
                                         </div>
                                         <div class="w-50 text-md-right">
-                                            <a href="mailto:forgotpassword.admin@sourcetech.net?subject=Forgot Password ~ Source Tech Login">Forgot Password</a>
+                                            <a href="mailto:forgotpassword.admin@sourcetech.net?subject=Forgot Password ~ Source Tech Login">Forgot Password</a> <!-- When clicked, the user will be redirected to the email client with the email address and subject already filled in -->
                                         </div>
                                     </div>
 

@@ -1,3 +1,18 @@
+<!--
+PHP intergration
+-->
+<?php
+require_once('../includes/functions.inc.php');
+// Make a database connection
+$conn = require '../includes/dbconfig.php';
+
+session_start();
+$empNo = $_SESSION['empNo'];
+$firstName = getFirstName($conn, $empNo);
+$lastName = getLastName($conn, $empNo);
+$accountType = getAccountType($conn, $empNo);
+?>
+
 <!--Created by Kevin Titus on 2022-07-21.-->
 <!DOCTYPE html>
 <html lang="en">
@@ -75,6 +90,21 @@
             visibility: hidden;
         }
     }
+
+    .form-group select {
+        font-size: 16px;
+        color: #555;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    .form-group select:focus {
+        outline: none;
+        border-color: #66afe9;
+        box-shadow: 0 0 5px rgba(102, 175, 233, 0.5);
+    }
 </style>
 
 <body>
@@ -108,215 +138,153 @@
                                 <div class="col-lg-12 grid-margin stretch-card">
                                     <div class="card">
                                         <div class="card-body">
-                                            <h4 class="card-title">Personal Details</h4>
-                                            <div class="container-fluid">
 
+                                            <div class="container-fluid">
                                                 <form action="../includes/signup.inc.php" method="POST">
                                                     <div class="row">
+
+
+
                                                         <div class="col-md-12">
-                                                            <div class="row">
-                                                                <div class="col-md-6" style="border-right: 1px solid rgba(103, 103, 103, 0.25); margin-bottom:10px;">
+                                                            <form>
 
-                                                                    <div class="form-group">
-                                                                        <label for="firstName">
-                                                                            First Name <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="firstName" name="firstName" required />
+                                                                <div class="form-group">
+                                                                    <label for="projectName">
+                                                                        Project name: <span style="color: red;">*</span>
+                                                                    </label>
+                                                                    <input type="text" class="form-control" id="projectName" name="projectName" required />
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label for="projectDescription">
+                                                                        Project Description:
+                                                                    </label>
+                                                                    <div style="position: relative;">
+                                                                        <textarea class="form-control" id="projectDescription" name="projectDescription" maxlength="150" oninput="updateCounter(this)" style="padding-right: 30px;"></textarea>
+                                                                        <span id="counter" style="position: absolute; bottom: 0; right: 10px; font-size: smaller;"></span>
                                                                     </div>
+                                                                </div>
 
-                                                                    <div class="form-group">
-                                                                        <label for="middleName">
-                                                                            Middle Name
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="middleName" name="middleName" />
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="lastName">
-                                                                            Last Name <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="lastName" name="lastName" required />
-                                                                    </div>
-
-
+                                                                <div class="form-group">
                                                                     <div class="row">
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label for="gender">
-                                                                                    Gender <span style="color: red;">*</span>
-                                                                                </label>
-                                                                                <select class="select2" style="width: 100%; height: 38px;" id="gender" name="gender" required>
-                                                                                    <option value="" disabled selected hidden>Please select</option>
-                                                                                    <option value="male">Male</option>
-                                                                                    <option value="female">Female</option>
-                                                                                    <option value="other">Other</option>
-                                                                                    <option value="not-say">Prefer not to say</option>
-                                                                                </select>
-                                                                            </div>
-
-                                                                            <style>
-                                                                                .select2 {
-                                                                                    padding: 8px;
-                                                                                    font-size: 14px;
-                                                                                    border: 1px solid #ccc;
-                                                                                    border-radius: 5px;
-                                                                                    appearance: none;
-                                                                                    -webkit-appearance: none;
-                                                                                    -moz-appearance: none;
-                                                                                }
-                                                                            </style>
+                                                                        <div class="col-sm-6">
+                                                                            <label for="priorityLevel">Priority Level:</label>
+                                                                            <select class="form-control" id="priorityLevel" name="priorityLevel">
+                                                                                <option value="high">High</option>
+                                                                                <option value="medium">Medium</option>
+                                                                                <option value="low">Low</option>
+                                                                            </select>
                                                                         </div>
-
-
-                                                                        <div class="col-md-6">
-                                                                            <div class="form-group">
-                                                                                <label for="DOB">
-                                                                                    Date of birth <span style="color: red;">*</span>
-                                                                                </label>
-                                                                                <input type="date" class="form-control" id="DOB" name="DOB" required />
-                                                                            </div>
+                                                                        <div class="col-sm-6">
+                                                                            <label for="projectStatus">Project Status:</label>
+                                                                            <select class="form-control" id="projectStatus" name="projectStatus">
+                                                                                <option value="in-progress">In Progress</option>
+                                                                                <option value="pending">Pending</option>
+                                                                                <option value="completed">Completed</option>
+                                                                            </select>
                                                                         </div>
-
                                                                     </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="phoneNumber">Phone
-                                                                            Number</label>
-                                                                        <input type="tel" class="form-control" id="phoneNumber" pattern="[0-9]{11}" name="phoneNumber">
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="addressInput">Home address <span style="color: red;">*</span></label>
-                                                                        <input type="text" class="form-control" id="address" required name="address">
-                                                                    </div>
-
-                                                                    <script>
-                                                                        // Wait for the page to load
-                                                                        document.addEventListener('DOMContentLoaded', function() {
-                                                                            // Create the Autocomplete object with UK address restrictions
-                                                                            const autocomplete = new google.maps.places.Autocomplete(
-                                                                                document.getElementById('address'), {
-                                                                                    types: ['geocode'], // Only return geocoding results (addresses)
-                                                                                    componentRestrictions: {
-                                                                                        country: 'GB'
-                                                                                    } // Restrict to UK addresses
-                                                                                });
-
-                                                                            // Add an event listener to update the input field with the formatted address when a place is selected
-                                                                            autocomplete.addListener('place_changed', function() {
-                                                                                const place = autocomplete.getPlace();
-                                                                                document.getElementById('address').value = place.formatted_address;
-                                                                            });
-                                                                        });
-                                                                    </script>
-
-                                                                    <style>
-                                                                        .form-group {
-                                                                            margin-bottom: 1rem;
-                                                                        }
-
-                                                                        label {
-                                                                            font-weight: bold;
-                                                                        }
-
-                                                                        input.form-control {
-                                                                            height: calc(2.25rem + 2px);
-                                                                            padding: .375rem .75rem;
-                                                                            font-size: 1rem;
-                                                                            line-height: 1.5;
-                                                                            border-radius: .25rem;
-                                                                            border: 1px solid #ced4da;
-                                                                        }
-                                                                    </style>
                                                                 </div>
 
 
-                                                                <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="projectTeamID">Team ID: <span style="color: red;">*</span></label>
+                                                                    <input type="text" class="form-control" id="projectTeamID" name="projectTeamID" placeholder="Search for a team ID" list="teamList1" required>
 
-                                                                    <div class="form-group">
-                                                                        <label for="accountType">
-                                                                            Account Type <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <select class="select3" style="width: 100%;" id="accountType" name="accountType" required>
-                                                                            <option value="" disabled selected hidden>Please select</option>
-                                                                            <option value="Employee">Employee</option>
-                                                                            <option value="Manager">Manager</option>
-                                                                            <option value="Administrator">Administrator</option>
-                                                                        </select>
-                                                                    </div>
+                                                                    <datalist id="teamList1">
+                                                                        <?php
+                                                                        // Query the teams table to get all teamIDs
+                                                                        $sql = "SELECT teamID FROM Teams";
+                                                                        $result = mysqli_query($conn, $sql);
 
-
-                                                                    <style>
-                                                                        .select3 {
-                                                                            padding: 8px;
-                                                                            font-size: 14px;
-                                                                            border: 1px solid #ccc;
-                                                                            border-radius: 5px;
-                                                                            appearance: none;
-                                                                            -webkit-appearance: none;
-                                                                            -moz-appearance: none;
+                                                                        // Loop through the query results and display them as options in the datalist
+                                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                                            echo "<option value='" . $row["teamID"] . "'>";
                                                                         }
-                                                                    </style>
-
-
-                                                                    <div class="form-group">
-                                                                        <label for="empNo">
-                                                                            Employee Number <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="empNo" placeholder="Enter a 13 digit number" pattern="[0-9]{13}" name="empNo" required>
-                                                                    </div>
-
-                                                                    <div class="form-group">
-                                                                        <label for="teams">
-                                                                            Search Teams <span style="color: red;">*</span>
-                                                                        </label>
-                                                                        <input type="text" class="form-control" id="teams" name="teams" placeholder="Search Teams" list="teamList" required />
-
-                                                                        <datalist id="teamList">
-                                                                            <option value="Team 1">
-                                                                            <option value="Team 2">
-                                                                            <option value="Team 3">
-                                                                                <!-- Add more options for each team -->
-                                                                        </datalist>
-                                                                    </div>
-
+                                                                        ?>
+                                                                    </datalist>
 
                                                                     <script>
-                                                                        const searchField = document.getElementById("teamSearch");
-                                                                        const optionsList = document.querySelectorAll("#teamList option");
-
-                                                                        searchField.addEventListener("input", function() {
-                                                                            let options = "";
-                                                                            optionsList.forEach(function(option) {
-                                                                                if (option.value.toLowerCase().includes(searchField.value.toLowerCase())) {
-                                                                                    options += "<option value='" + option.value + "'>" + option.value + "</option>";
-                                                                                }
-                                                                            });
-                                                                            searchField.setAttribute("list", "teamList");
-                                                                            document.getElementById("teamList").innerHTML = options;
+                                                                        // Listen for changes on the datalist input
+                                                                        document.getElementById("teamID").addEventListener("input", function() {
+                                                                            // Get the selected option and set the hidden input value to the corresponding data-value attribute
+                                                                            var option = document.querySelector("#teamList1 option[value='" + this.value + "']");
+                                                                            if (option) {
+                                                                                document.getElementById("teamID").value = option.value;
+                                                                            }
                                                                         });
                                                                     </script>
-
-                                                                    <div class="form-group">
-                                                                        <label class="label" for="email">Email <span style="color: red;">*</span></label>
-                                                                        <input type="email" class="form-control" placeholder="example.1234@sourcetech.net" required name="email" id="email" />
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label for="password">Create a password <span style="color: red;">*</span></label>
-                                                                        <input type="password" class="form-control" placeholder="Password" required name="password" id="password" />
-                                                                    </div>
-                                                                    <div class="form-group">
-                                                                        <label for="confirmPassword">Confirm Password <span style="color: red;">*</span></label>
-                                                                        <input type="password" class="form-control" placeholder="Enter your password again" required name="confirmPassword" id="confirmPassword" />
-                                                                    </div>
-
-
                                                                 </div>
-                                                            </div>
 
-                                                            <button type="submit" name="submit" class="form-control btn btn-primary rounded submit px-3">
-                                                                <b>Add user</b></button>
+                                                                <div class="form-group">
+                                                                    <label for="projectLead">Project Lead: <span style="color: red;">*</span></label>
+                                                                    <input type="text" class="form-control" id="projectLead" name="projectLead" placeholder="Search for a lead" list="projectLeadList" required>
+                                                                    <input type="hidden" id="projectLeadID" name="projectLeadID" value="">
+
+                                                                    <datalist id="projectLeadList">
+                                                                        <?php
+                                                                        // Query the users table to get all users with accountType "Manager"
+                                                                        $sql = "SELECT UserID, CONCAT(firstName, ' ', lastName) AS fullName FROM Users WHERE accountType = 'Manager'";
+                                                                        $result = mysqli_query($conn, $sql);
+
+                                                                        // Loop through the query results and display them as options in the datalist
+                                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                                            echo "<option value='" . $row["fullName"] . "' data-value='" . $row["UserID"] . "'>";
+                                                                        }
+                                                                        ?>
+                                                                    </datalist>
+
+                                                                    <script>
+                                                                        // Listen for changes on the datalist input
+                                                                        document.getElementById("projectLead").addEventListener("input", function() {
+                                                                            // Get the selected option and set the value of the input field and hidden input to the corresponding data-value attribute
+                                                                            var option = document.querySelector("#projectLeadList option[value='" + this.value + "']");
+                                                                            if (option) {
+                                                                                var userID = option.getAttribute("data-value");
+                                                                                document.getElementById("projectLeadID").value = userID;
+                                                                                this.value = option.value;
+                                                                            }
+                                                                        });
+                                                                    </script>
+                                                                </div>
+
+                                                                <script>
+                                                                    function updateCounter(field) {
+                                                                        var maxLength = 150;
+                                                                        var currentLength = field.value.length;
+                                                                        var counter = document.getElementById("counter");
+                                                                        counter.textContent = currentLength + "/" + maxLength;
+                                                                    }
+                                                                </script>
+
+                                                                <!-- Error message -->
+                                                                <?php
+                                                                if (isset($_GET['error']) && $_GET['error'] === "emptyinput") {
+                                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
+                                                                }
+
+                                                                //Project Name already exists
+                                                                else if (isset($_GET['error']) && $_GET['error'] === "projectnamealreadyexists") {
+                                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
+
+                                                                    //Team ID already exists
+                                                                } else if (isset($_GET['error']) && $_GET['error'] === "projectidalreadyexists") {
+                                                                    $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
+                                                                    echo "<div class='title' style='text-align: center; padding: 2% 0% 2% 0%; color: red;'>" . htmlspecialchars($message) . "</div>";
+                                                                }
+                                                                ?>
+                                                                <!-- End of error message -->
+
+
+
+                                                                <button type="submit" name="createProject" class="form-control btn     btn-primary rounded submit px-3">
+                                                                    <b>Create Project</b>
+                                                                </button>
+
                                                         </div>
+
                                                     </div>
                                                 </form>
                                             </div>
@@ -324,8 +292,6 @@
                                     </div>
                                 </div>
                             </div>
-
-
 
                             <!-- content-wrapper ends -->
 
@@ -371,25 +337,6 @@
                     }
                 </script>
 
-                <script>
-                    $(function() {
-                        var sixteenYearsAgo = new Date();
-                        var hundredYearsAgo = new Date();
-                        sixteenYearsAgo.setFullYear(sixteenYearsAgo.getFullYear() - 16);
-                        hundredYearsAgo.setFullYear(hundredYearsAgo.getFullYear() - 100);
-
-                        var maxDate = sixteenYearsAgo.toISOString().split('T')[0];
-                        var minDate = hundredYearsAgo.toISOString().split('T')[0];
-
-                        $('#DOB').attr('max', maxDate);
-                        $('#DOB').attr('min', minDate);
-                        $('#DOB').val(maxDate);
-                    });
-                </script>
-
-
 </body>
-
-
 
 </html>

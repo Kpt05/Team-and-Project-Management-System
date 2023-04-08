@@ -48,6 +48,12 @@ function emptyInputTeam(
 
 
 
+
+
+
+
+
+
 //Function to check if password and confirm password match
 function passwordMatch($password, $confirmPassword)
 {
@@ -157,6 +163,84 @@ function teamIDExists ($conn, $teamID)
 
 
 
+
+
+
+
+
+
+
+
+//Function to check if projectName already exists
+function projectNameExists ($conn, $projectName)
+{
+    $sql = "SELECT * FROM Projects WHERE projectName = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../projects/viewProjects.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $projectName);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row;
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+
+//Function to check if projectID already exists
+function projectIDExists ($conn, $projectID)
+{
+    $sql = "SELECT * FROM Projects WHERE projectID = ?;";
+    $stmt = mysqli_stmt_init($conn);
+    if (!mysqli_stmt_prepare($stmt, $sql)) {
+        header("Location: ../projects/viewProjects.php?error=stmtfailed");
+        exit();
+    }
+
+    mysqli_stmt_bind_param($stmt, "s", $projectID);
+    mysqli_stmt_execute($stmt);
+
+    $resultData = mysqli_stmt_get_result($stmt);
+
+    if ($row = mysqli_fetch_assoc($resultData)) {
+        return $row;
+    } else {
+        $result = false;
+        return $result;
+    }
+}
+
+function emptyInputProject(
+    $projectName,
+    $projectTeamID,
+    $projectLead
+) {
+    $result = '';
+    if (empty($projectName) || empty($projectTeamID) || empty($projectLead)) {
+        $result = true;
+    } else {
+        $result = false;
+    }
+    return $result;
+}
+
+
+
+
+
+
+
+
+
+
 //Function to check for empty fields in login form 
 function emptyInputLogin($email, $password)
 {
@@ -244,6 +328,127 @@ function createTeam($conn, $teamID ,$teamName, $teamDescription, $department, $t
         }
     }
 }
+
+
+// Function to create a new Project
+
+function createProject($conn, $projectID, $projectName, $projectDescription, $priorityLevel, $projectStatus, $projectTeamID, $projectLeadID)
+{
+    $conn->begin_transaction();
+    $sql = "INSERT INTO Projects (projectID, projectName, projectDescription, priorityLevel, projectStatus, projectTeamID, projectLeadID)
+    VALUES (?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->stmt_init();
+    if (!$stmt->prepare($sql)) {
+        $error = "SQL statement failed: " . $conn->error;
+        $conn->rollback();
+        header("Location: ../createProjects.php?error=" . $error);
+        exit();
+    } else {
+        // Bind parameters
+        $stmt->bind_param("ssssssi", $projectID, $projectName, $projectDescription, $priorityLevel, $projectStatus, $projectTeamID, $projectLeadID);
+
+        if (!$stmt->execute()) {
+            $error = "Error executing statement: " . $stmt->error;
+            $conn->rollback();
+            header("Location: ../projects/createProjects.php?error=" . $error);
+            exit();
+        } else {
+            $conn->commit();
+            header("Location: ../projects/viewProjects.php"); //Redirect to Project View page
+            exit();
+        }
+    }
+}
+
+
+
+
+
+function updateUserReport($conn, $userID, $tasksCompleted, $hoursWorked)
+{
+    $conn->begin_transaction();
+
+    // Check if record with userID already exists
+    $sql = "SELECT * FROM Reports WHERE userID = ?";
+    $stmt = $conn->stmt_init();
+    if (!$stmt->prepare($sql)) {
+        $error = "SQL statement failed: " . $conn->error;
+        $conn->rollback();
+        header("Location: ../system_users/userPerformance.php?status=error&message=" . urlencode($error)); // Redirect to index page with error message
+        exit();
+    } else {
+        // Bind parameters
+        $stmt->bind_param("i", $userID);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        if ($result->num_rows > 0) {
+            // Update existing record
+            $row = $result->fetch_assoc();
+            $tasksCompleted += $row['tasksCompleted'];
+            $hoursWorked += $row['hoursWorked'];
+
+            $sql = "UPDATE Reports SET tasksCompleted = ?, hoursWorked = ? WHERE userID = ?";
+            $stmt = $conn->stmt_init();
+            if (!$stmt->prepare($sql)) {
+                $error = "SQL statement failed: " . $conn->error;
+                $conn->rollback();
+                header("Location: ../system_users/userPerformance.php?status=error&message=" . urlencode($error)); // Redirect to index page with error message
+                exit();
+            } else {
+                // Bind parameters
+                $stmt->bind_param("iii", $tasksCompleted, $hoursWorked, $userID);
+            }
+        } else {
+            // Insert new record
+            $sql = "INSERT INTO Reports (userID, tasksCompleted, hoursWorked)
+                    VALUES (?, ?, ?)";
+            $stmt = $conn->stmt_init();
+            if (!$stmt->prepare($sql)) {
+                $error = "SQL statement failed: " . $conn->error;
+                $conn->rollback();
+                header("Location: ../system_users/userPerformance.php?status=error&message=" . urlencode($error)); // Redirect to index page with error message
+                exit();
+            } else {
+                // Bind parameters
+                $stmt->bind_param("iii", $userID, $tasksCompleted, $hoursWorked);
+            }
+        }
+
+        // Execute statement and handle errors
+        if (!$stmt->execute()) {
+            $error = "Error executing statement: " . $stmt->error;
+            $conn->rollback();
+            header("Location: ../system_users/userPerformance.php?status=error&message=" . urlencode($error)); // Redirect to index page with error message
+            exit();
+        } else {
+            $conn->commit();
+            header("Location: ../system_users/userPerformance.php?status=success"); // Redirect to index page with success status
+            exit();
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -410,17 +615,20 @@ function getUserStatus($conn,$userID) {
     }
 }
 
+function clockIn($conn, $userID) {
+    $stmt = mysqli_prepare($conn, "INSERT INTO clockings (UserID, clockInTime) VALUES (?, DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'))");
+    mysqli_stmt_bind_param($stmt, "i", $userID);
+    $success = mysqli_stmt_execute($stmt);
 
-function clockIn($conn,$userID) {
-
-    // Insert a new clocking record for the user
-    $query = "INSERT INTO clockings (UserID, clockInTime) VALUES ($userID, NOW())";
-    $result = mysqli_query($conn, $query);
-    
-    if ($result) {
-        return "Clocked In Successfully";
+    if ($success) {
+        return true;
     } else {
-        return "Error: " . mysqli_error($conn);
+        $error = mysqli_stmt_error($stmt);
+        if (mysqli_errno($conn) == 1062) {
+            return "You have already clocked in";
+        } else {
+            return "Error: $error";
+        }
     }
 }
 
@@ -482,22 +690,48 @@ function endBreak($conn, $userID) {
     }
 }
 
-function displayClockingHistory($conn,$userID) {
-
+function getClockingHistory($conn, $userID) {
     // Retrieve all clocking records for the user
     $query = "SELECT * FROM clockings WHERE UserID = $userID ORDER BY ClockingsID DESC";
     $result = mysqli_query($conn, $query);
-    
-    // Display the clocking history in a table
+
+    $clockings = array(); // Initialize an empty array to hold the clockings
     if (mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_assoc($result)) {
+            // Add each clocking to the array
+            $clocking = array(
+                "id" => $row["ClockingsID"],
+                "clockInTime" => $row["clockInTime"],
+                "clockOutTime" => $row["clockOutTime"],
+                "breakStartTime" => $row["breakStartTime"],
+                "breakEndTime" => $row["breakEndTime"],
+                "hoursWorked" => $row["hoursWorked"],
+                "breakDuration" => $row["breakDuration"]
+            );
+            $clockings[] = $clocking;
+        }
+    }
+    return $clockings;
+}
+function displayClockingHistory($conn,$userID) {
+    $clockings = getClockingHistory($conn, $userID);
+
+    if (count($clockings) > 0) {
         echo "<table>";
         echo "<tr><th>Clocking ID</th><th>Clock-In Time</th><th>Clock-Out Time</th><th>Break Start Time</th><th>Break End Time</th><th>Hours Worked</th><th>Break Duration</th></tr>";
-        while ($row = mysqli_fetch_assoc($result)) {
-            echo "<tr><td>" . $row["ClockingsID"] . "</td><td>" . $row["clockInTime"] . "</td><td>" . $row["clockOutTime"] . "</td><td>" . $row["breakStartTime"] . "</td><td>" . $row["breakEndTime"] . "</td><td>" . $row["hoursWorked"] . "</td><td>" . $row["breakDuration"] . "</td></tr>";
+        foreach ($clockings as $clocking) {
+            echo "<tr><td>" . $clocking["id"] . "</td><td>" . $clocking["clockInTime"] . "</td><td>" . $clocking["clockOutTime"] . "</td><td>" . $clocking["breakStartTime"] . "</td><td>" . $clocking["breakEndTime"] . "</td><td>" . $clocking["hoursWorked"] . "</td><td>" . $clocking["breakDuration"] . "</td></tr>";
         }
         echo "</table>";
     } else {
         echo "No clocking history found for this user.";
     }
 }
+
+
+
+
+
+
+
 
