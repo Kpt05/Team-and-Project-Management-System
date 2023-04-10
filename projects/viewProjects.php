@@ -1,18 +1,18 @@
-<!--
-PHP intergration
--->
-<?php
-require_once('../includes/functions.inc.php');
+<!--Created by Kevin Titus on 2022-07-19.-->
+<!-- PHP intergration -->
+<?php 
+require_once('../includes/functions.inc.php'); // Include the PHP functions to be used on the page
 // Make a database connection
-$conn = require '../includes/dbconfig.php';
+$conn = require '../includes/dbconfig.php'; // Connect to the database file
 
+// Start the session
 session_start();
 $empNo = $_SESSION['empNo'];
 $firstName = getFirstName($conn, $empNo);
 $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
 
-
+// If the delete button is clicked, the following will delete the project from the database
 if (isset($_POST['delete-project'])) {
     $projectID = $_POST["projectID"];
     $query = "DELETE FROM projects WHERE projectID = $projectID";
@@ -30,10 +30,8 @@ $result = mysqli_query($conn, $sql);
 $sql = "SELECT * FROM Projects";
 $result = mysqli_query($conn, $sql);
 
-
 ?>
 
-<!--Created by Kevin Titus on 2022-07-19.-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -47,7 +45,6 @@ $result = mysqli_query($conn, $sql);
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
-    <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
@@ -55,9 +52,7 @@ $result = mysqli_query($conn, $sql);
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css" />
-    <!-- endinject -->
     <link rel="shortcut icon" href="../images/favicon.ico" />
-
 
     <!-- Google Fonts
 		============================================ -->
@@ -66,10 +61,10 @@ $result = mysqli_query($conn, $sql);
     <!-- Data Table JS
 		============================================ -->
     <link rel="stylesheet" href="../css/jquery.dataTables.min.css" />
-
 </head>
 
 <style>
+    /* Loader */
     * {
         margin: 0;
         padding: 0;
@@ -99,6 +94,7 @@ $result = mysqli_query($conn, $sql);
         }
     }
 
+    /* Team Cards */
     .team-card {
         border: 1px solid #ddd;
         padding: 10px;
@@ -186,7 +182,7 @@ $result = mysqli_query($conn, $sql);
 </style>
 
 <body>
-
+    <!-- Loader -->
     <div class="loader">
         <img src="../images/loader.gif" alt="" />
     </div>
@@ -195,7 +191,6 @@ $result = mysqli_query($conn, $sql);
 
         <!-- partial:includes/_navbar.php -->
         <?php include "../includes/_navbar.php"; ?>
-
 
         <div class="container-fluid page-body-wrapper">
 
@@ -207,15 +202,18 @@ $result = mysqli_query($conn, $sql);
                 <div class="content-wrapper">
                     <div class="row">
                         <div class="col-md-8">
-                            <h2 class="font-weight-bold">View Projects</h2>
+                            <h2 class="font-weight-bold">View Projects</h2> <!-- Page Title -->
                         </div>
-                        <div class="col-md-4 text-md-right">
+                        
+                        <div class="col-md-4 text-md-right"> <!-- Add Project Button -->
                             <a href="createProjects.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
                                 <i class="bi bi-plus" style="font-size: 1.5rem; color: #375577;"></i>
                             </a>
+                             <!-- Edit Project Button -->
                             <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-project" style="opacity: 0.5; pointer-events: none;">
                                 <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
                             </button>
+                             <!-- Delete Project Button -->
                             <button type="button" class="btn btn-link text-decoration-none text-reset" id="delete-project" style="opacity: 0.5; pointer-events: none;">
                                 <i class="bi bi-trash2" style="font-size: 1.5rem; color: #375577;"></i>
                             </button>
@@ -223,31 +221,33 @@ $result = mysqli_query($conn, $sql);
                     </div>
 
                     <div class="row mt-4">
-                        <div class="col-lg-12 grid-margin stretch-card">
+                        <div class="col-lg-12 grid-margin stretch-card"> <!-- Main panel card -->
                             <div class="card">
-                                <div class="card-body">
+                                <div class="card-body"> <!-- Main panel card body -->
+                                    <!-- Team Cards -->
                                     <?php
                                     while ($row = mysqli_fetch_assoc($result)) {
-                                        echo '<div class="team-card">';
-                                        echo '<div class="team-pic" style="background-image: url(' . $row["team_pic"] . ');"></div>';
-                                        echo '<div class="team-name">' . $row["projectName"] . '</div>';
-                                        echo '<div class="team-info" data-projectID="' . $row["projectID"] . '">Project ID: ' . $row["projectID"] . '</div>';
-                                        echo '<div class="team-info">Status: ' . $row["projectStatus"] . '</div>';
+                                        echo '<div class="team-card">'; // Team card
+                                        echo '<div class="team-pic" style="background-image: url(' . $row["team_pic"] . ');"></div>'; // Team picture
+                                        echo '<div class="team-name">' . $row["projectName"] . '</div>'; // Team name
+                                        echo '<div class="team-info" data-projectID="' . $row["projectID"] . '">Project ID: ' . $row["projectID"] . '</div>'; // Project ID
+                                        echo '<div class="team-info">Status: ' . $row["projectStatus"] . '</div>'; // Project status
                                         // Retrieve full name and email of project lead from Users table
-                                        $projectID = $row["projectID"];
-                                        $projectLeadID = $row["projectLeadID"];
-                                        $query = "SELECT CONCAT(firstName, ' ', lastName) AS fullName, email FROM Users WHERE userID = $projectLeadID";
-                                        $result2 = mysqli_query($conn, $query);
-                                        $projectLeadRow = mysqli_fetch_assoc($result2);
-                                        $projectLeadFullName = $projectLeadRow["fullName"];
-                                        $projectLeadEmail = $projectLeadRow["email"];
-                                        echo '<div class="team-info">Team Lead: ' . $projectLeadFullName . '</div>';
+                                        // Variable retrieval
+                                        $projectID = $row["projectID"]; // Project ID
+                                        $projectLeadID = $row["projectLeadID"]; // Project lead ID
+                                        $query = "SELECT CONCAT(firstName, ' ', lastName) AS fullName, email FROM Users WHERE userID = $projectLeadID"; // Query to retrieve full name and email of project lead
+                                        $result2 = mysqli_query($conn, $query); // Execute query
+                                        $projectLeadRow = mysqli_fetch_assoc($result2); // Retrieve row
+                                        $projectLeadFullName = $projectLeadRow["fullName"]; // Project lead full name
+                                        $projectLeadEmail = $projectLeadRow["email"]; // Project lead email
+                                        echo '<div class="team-info">Team Lead: ' . $projectLeadFullName . '</div>'; // Project lead full name
                                         // Make the email address clickable and opens the default email client
                                         echo '<div class="team-info">Email: <a href="mailto:' . $projectLeadEmail . '">' . $projectLeadEmail . '</a></div>';
                                         echo '</div>';
                                     }
                                     ?>
-                                    <div class="create-team-card" onclick="location.href='createProjects.php';">
+                                    <div class="create-team-card" onclick="location.href='createProjects.php';"> <!-- If clicked, redirect to createProjects.php -->
                                         <div class="create-team-icon">+</div>
                                     </div>
                                 </div>
@@ -289,9 +289,6 @@ $result = mysqli_query($conn, $sql);
     <script src="../js/Chart.roundedBarCharts.js"></script>
     <!-- End custom js for this page-->
 
-
-    <!-- Data Table area End-->
-
     <!-- End Footer area-->
     <!-- jquery
 		============================================ -->
@@ -308,7 +305,7 @@ $result = mysqli_query($conn, $sql);
 		============================================ -->
     <script src="../js/main.js"></script>
 
-
+    <!-- Loader -->
     <script>
         var loader = document.querySelector(".loader")
 
@@ -322,8 +319,7 @@ $result = mysqli_query($conn, $sql);
 
 </body>
 
-
-
+<!-- Javascript to allow user to select by clicking on cards -->
 <script>
     // Get all the team cards
     const teamCards = document.querySelectorAll('.team-card');
@@ -365,6 +361,7 @@ $result = mysqli_query($conn, $sql);
         });
     });
 
+    // Javascript to allow user to delete projects by clicking on the delete button
     const deleteBtn = document.getElementById('delete-project');
 
     deleteBtn.addEventListener('click', () => {
@@ -403,6 +400,4 @@ $result = mysqli_query($conn, $sql);
     <input type="hidden" name="projectID" id="delete-project-id">
     <input type="submit" name="delete-project">
 </form>
-
-
 </html>

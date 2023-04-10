@@ -1,32 +1,31 @@
-<!--
-PHP intergration
--->
+<!--Created by Kevin Titus on 2022-07-21.-->
+<!-- PHP intergration -->
 <?php
-require_once('../includes/functions.inc.php');
-// Make a database connection
-$conn = require '../includes/dbconfig.php';
 
+require_once('../includes/functions.inc.php'); // Include the functions.inc.php file
+// Make a database connection
+$conn = require '../includes/dbconfig.php'; // Include the dbconfig.php file which contains the database connection details
+
+// Start a session
 session_start();
-$empNo = $_SESSION['empNo'];
-$firstName = getFirstName($conn, $empNo);
-$lastName = getLastName($conn, $empNo);
-$accountType = getAccountType($conn, $empNo);
+$empNo = $_SESSION['empNo']; // Get the employee number from the session
+$firstName = getFirstName($conn, $empNo); // Get the first name of the user
+$lastName = getLastName($conn, $empNo); // Get the last name of the user
+$accountType = getAccountType($conn, $empNo); // Get the account type of the user
 ?>
 
-<!--Created by Kevin Titus on 2022-07-21.-->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Source Tech Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /> 
+    <title>Source Tech Portal</title> <!-- Title of the page -->
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css" />
-    <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
@@ -44,24 +43,22 @@ $accountType = getAccountType($conn, $empNo);
     <script src="~bulma-calendar/dist/js/bulma-calendar.min.js"></script>
 
     <!-- End plugin css for this page -->
-    <!-- inject:css -->
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css" />
-    <!-- endinject -->
     <link rel="shortcut icon" href="../images/favicon.ico" />
 
 
     <script>
+        // Loader script to make the loader disappear after 1.5 seconds
         $(document).ready(function() {
             $('.js-example-basic-single').select2();
         });
     </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvUiP0DYjb3XiFw9toptx7gBtokfnyfFM&libraries=places"></script>
-
-
 </head>
 
+<!-- CSS -->
 <style>
+    /* Loader Styling */
     * {
         margin: 0;
         padding: 0;
@@ -108,6 +105,7 @@ $accountType = getAccountType($conn, $empNo);
 </style>
 
 <body>
+    <!-- Loader -->
     <div class="loader">
         <img src="../images/loader.gif" alt="" />
     </div>
@@ -129,7 +127,7 @@ $accountType = getAccountType($conn, $empNo);
                         <div class="col-md-12 grid-margin">
                             <div class="row">
                                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-                                    <h3 class="font-weight-bold">Create a project</h3>
+                                    <h3 class="font-weight-bold">Create a project</h3> <!-- Page title -->
                                 </div>
                                 <div class="row"></div>
                                 <div class="col-lg-12 grid-margin stretch-card">
@@ -137,10 +135,8 @@ $accountType = getAccountType($conn, $empNo);
                                         <div class="card-body">
 
                                             <div class="container-fluid">
-                                                <form action="../includes/signup.inc.php" method="POST">
+                                                <form action="../includes/signup.inc.php" method="POST"> <!-- Form to create a project, and all inputs get passed into the signup.php file -->
                                                     <div class="row">
-
-
 
                                                         <div class="col-md-12">
                                                             <form>
@@ -149,7 +145,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                     <label for="projectName">
                                                                         Project name: <span style="color: red;">*</span>
                                                                     </label>
-                                                                    <input type="text" class="form-control" id="projectName" name="projectName" required />
+                                                                    <input type="text" class="form-control" id="projectName" name="projectName" required /> <!-- Project name input, also set to required -->
                                                                 </div>
 
                                                                 <div class="form-group">
@@ -157,7 +153,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                         Project Description:
                                                                     </label>
                                                                     <div style="position: relative;">
-                                                                        <textarea class="form-control" id="projectDescription" name="projectDescription" maxlength="150" oninput="updateCounter(this)" style="padding-right: 30px;"></textarea>
+                                                                        <textarea class="form-control" id="projectDescription" name="projectDescription" maxlength="150" oninput="updateCounter(this)" style="padding-right: 30px;"></textarea> <!-- Project description input, uses the updateCounter function to count the characters -->
                                                                         <span id="counter" style="position: absolute; bottom: 0; right: 10px; font-size: smaller;"></span>
                                                                     </div>
                                                                 </div>
@@ -191,21 +187,21 @@ $accountType = getAccountType($conn, $empNo);
                                                                     <datalist id="teamList1">
                                                                         <?php
                                                                         // Query the teams table to get all teamIDs
-                                                                        $sql = "SELECT teamID FROM Teams";
-                                                                        $result = mysqli_query($conn, $sql);
+                                                                        $sql = "SELECT teamID FROM Teams"; // SQL query to get all teamIDs
+                                                                        $result = mysqli_query($conn, $sql); // Run the query
 
                                                                         // Loop through the query results and display them as options in the datalist
-                                                                        while ($row = mysqli_fetch_assoc($result)) {
-                                                                            echo "<option value='" . $row["teamID"] . "'>";
+                                                                        while ($row = mysqli_fetch_assoc($result)) { // Loop through the query results
+                                                                            echo "<option value='" . $row["teamID"] . "'>"; // Display the teamID as an option
                                                                         }
                                                                         ?>
                                                                     </datalist>
 
                                                                     <script>
                                                                         // Listen for changes on the datalist input
-                                                                        document.getElementById("teamID").addEventListener("input", function() {
+                                                                        document.getElementById("teamID").addEventListener("input", function() { // Listen for changes on the datalist input
                                                                             // Get the selected option and set the hidden input value to the corresponding data-value attribute
-                                                                            var option = document.querySelector("#teamList1 option[value='" + this.value + "']");
+                                                                            var option = document.querySelector("#teamList1 option[value='" + this.value + "']"); // Get the selected option
                                                                             if (option) {
                                                                                 document.getElementById("teamID").value = option.value;
                                                                             }
@@ -221,7 +217,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                     <datalist id="projectLeadList">
                                                                         <?php
                                                                         // Query the users table to get all users with accountType "Manager"
-                                                                        $sql = "SELECT UserID, CONCAT(firstName, ' ', lastName) AS fullName FROM Users WHERE accountType = 'Manager'";
+                                                                        $sql = "SELECT UserID, CONCAT(firstName, ' ', lastName) AS fullName FROM Users WHERE accountType = 'Manager'"; // SQL query to get all users with accountType "Manager"
                                                                         $result = mysqli_query($conn, $sql);
 
                                                                         // Loop through the query results and display them as options in the datalist
@@ -235,10 +231,10 @@ $accountType = getAccountType($conn, $empNo);
                                                                         // Listen for changes on the datalist input
                                                                         document.getElementById("projectLead").addEventListener("input", function() {
                                                                             // Get the selected option and set the value of the input field and hidden input to the corresponding data-value attribute
-                                                                            var option = document.querySelector("#projectLeadList option[value='" + this.value + "']");
+                                                                            var option = document.querySelector("#projectLeadList option[value='" + this.value + "']"); // Get the selected option
                                                                             if (option) {
-                                                                                var userID = option.getAttribute("data-value");
-                                                                                document.getElementById("projectLeadID").value = userID;
+                                                                                var userID = option.getAttribute("data-value"); // Get the data-value attribute
+                                                                                document.getElementById("projectLeadID").value = userID; // Set the value of the hidden input
                                                                                 this.value = option.value;
                                                                             }
                                                                         });
@@ -246,6 +242,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                 </div>
 
                                                                 <script>
+                                                                    // Function to count the characters in the project description input
                                                                     function updateCounter(field) {
                                                                         var maxLength = 150;
                                                                         var currentLength = field.value.length;
@@ -254,7 +251,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                     }
                                                                 </script>
 
-                                                                <!-- Error message -->
+                                                                <!-- Error messagea -->
                                                                 <?php
                                                                 if (isset($_GET['error']) && $_GET['error'] === "emptyinput") {
                                                                     $message = isset($_GET['message']) ? $_GET['message'] : "An error has occurred.";
@@ -274,14 +271,11 @@ $accountType = getAccountType($conn, $empNo);
                                                                 ?>
                                                                 <!-- End of error message -->
 
-
-
-                                                                <button type="submit" name="createProject" class="form-control btn     btn-primary rounded submit px-3">
+                                                                <button type="submit" name="createProject" class="form-control btn     btn-primary rounded submit px-3"> <!-- Submit button -->
                                                                     <b>Create Project</b>
                                                                 </button>
 
                                                         </div>
-
                                                     </div>
                                                 </form>
                                             </div>
@@ -325,6 +319,7 @@ $accountType = getAccountType($conn, $empNo);
                 <!-- End custom js for this page-->
 
                 <script>
+                    // Loader animation script
                     var loader = document.querySelector(".loader")
 
                     window.addEventListener("load", vanish);
@@ -335,5 +330,4 @@ $accountType = getAccountType($conn, $empNo);
                 </script>
 
 </body>
-
 </html>

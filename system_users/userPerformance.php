@@ -1,20 +1,18 @@
-<!--
-PHP intergration
--->
+<!--Created by Kevin Titus on 2022-07-19.-->
+<!-- PHP intergration -->
 <?php
-require_once('../includes/functions.inc.php');
+require_once('../includes/functions.inc.php'); // Include the functions file
 // Make a database connection
 $conn = require '../includes/dbconfig.php';
 
+// Start the session
 session_start();
-$empNo = $_SESSION['empNo'];
-$firstName = getFirstName($conn, $empNo);
-$lastName = getLastName($conn, $empNo);
-$accountType = getAccountType($conn, $empNo);
-
+$empNo = $_SESSION['empNo']; // Get the employee number of the logged in user
+$firstName = getFirstName($conn, $empNo); // Get the first name of the logged in user
+$lastName = getLastName($conn, $empNo); // Get the last name of the logged in user
+$accountType = getAccountType($conn, $empNo); // Get the account type of the logged in user
 ?>
 
-<!--Created by Kevin Titus on 2022-07-19.-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,7 +20,7 @@ $accountType = getAccountType($conn, $empNo);
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>My Dashboard | Source Tech Portal</title>
+    <title>User Performance | Source Tech Portal</title> <!-- Title of the page -->
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
@@ -53,10 +51,9 @@ $accountType = getAccountType($conn, $empNo);
 		============================================ -->
     <link rel="stylesheet" href="../css/jquery.dataTables.min.css" />
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvUiP0DYjb3XiFw9toptx7gBtokfnyfFM&libraries=places"></script>
-
 </head>
 <style>
+    /* Loader */
     * {
         margin: 0;
         padding: 0;
@@ -88,7 +85,7 @@ $accountType = getAccountType($conn, $empNo);
 </style>
 
 <body>
-
+    <!-- Loader -->
     <div class="loader">
         <img src="../images/loader.gif" alt="" />
     </div>
@@ -97,7 +94,6 @@ $accountType = getAccountType($conn, $empNo);
 
         <!-- partial:includes/_navbar.php -->
         <?php include "../includes/_navbar.php"; ?>
-
 
         <div class="container-fluid page-body-wrapper">
 
@@ -109,70 +105,65 @@ $accountType = getAccountType($conn, $empNo);
                 <div class="content-wrapper">
                     <div class="row">
                         <div class="col-md-8">
-                            <h2 class="font-weight-bold">User Performance</h2>
+                            <h2 class="font-weight-bold">User Performance</h2> <!-- Page title -->
                             <h6 class="font-weight-normal mb-0">
                             </h6>
                         </div>
                     </div>
 
+                    <!-- The Main card container in which the form inputs are placed in -->
                     <div class="row mt-4">
                         <div class="col-lg-12 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="container-fluid">
 
-
-                                        <form method="post" action="../includes/signup.inc.php">
+                                        <form method="post" action="../includes/signup.inc.php"> <!-- Form action, all form inputs are submitted to the signup.inc.php file -->
                                             <div class="form-group">
-                                                <label for="userID">
+                                                <label for="userID"> <!-- User ID label -->
                                                     Name: <span style="color: red;">*</span>
                                                 </label>
-                                                <select class="form-control" id="userID" name="userID" required>
+                                                <select class="form-control" id="userID" name="userID" required> <!-- User ID dropdown list -->
                                                     <?php
                                                     // Query the users table to get all users with accountType "Employee" or "Manager"
-                                                    $sql = "SELECT UserID, CONCAT(firstName, ' ', lastName, ' - ', empNo) AS fullName, empNo FROM Users WHERE accountType IN ('Employee', 'Manager')";
-                                                    $result = mysqli_query($conn, $sql);
+                                                    $sql = "SELECT UserID, CONCAT(firstName, ' ', lastName, ' - ', empNo) AS fullName, empNo FROM Users WHERE accountType IN ('Employee', 'Manager')"; // Query to get all users with accountType "Employee" or "Manager"
+                                                    $result = mysqli_query($conn, $sql); // Run the query
 
                                                     // Fetch query results and store them in an array
-                                                    $users = array();
+                                                    $users = array(); // Array to store users
                                                     while ($row = mysqli_fetch_assoc($result)) {
-                                                        $users[] = $row;
+                                                        $users[] = $row; // Add user to the users array
                                                     }
 
                                                     // Loop through the users array and display them as options in the dropdown list
-                                                    foreach ($users as $user) {
+                                                    foreach ($users as $user) { // Loop through the users array
                                                         $selected = "";
-                                                        if (isset($_POST["userID"]) && $_POST["userID"] == $user["UserID"]) {
+                                                        if (isset($_POST["userID"]) && $_POST["userID"] == $user["UserID"]) { // If the user ID is set and matches the current user ID, set the selected variable to "selected"
                                                             $selected = "selected";
                                                         }
-                                                        echo "<option value='" . $user["UserID"] . "' " . $selected . ">" . $user["fullName"] . "</option>";
+                                                        echo "<option value='" . $user["UserID"] . "' " . $selected . ">" . $user["fullName"] . "</option>"; // Display the user as an option in the dropdown list
                                                     }
                                                     ?>
                                                 </select>
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="tasksCompleted">Tasks Completed:</label>
+                                                <label for="tasksCompleted">Tasks Completed:</label> <!-- Tasks completed label -->
                                                 <input type="text" class="form-control" id="tasksCompleted" name="tasksCompleted" required inputmode="numeric" pattern="[0-9]*">
                                             </div>
 
                                             <div class="form-group">
-                                                <label for="hoursWorked">Hours Worked:</label>
+                                                <label for="hoursWorked">Hours Worked:</label> <!-- Hours worked label -->
                                                 <input type="number" class="form-control" id="hoursWorked" name="hoursWorked" required>
                                             </div>
 
-                                            <button type="submit" name="userPerformance" class="btn btn-primary">Submit</button>
+                                            <button type="submit" name="userPerformance" class="btn btn-primary">Submit</button> <!-- Submit button -->
                                         </form>
-
 
                                     </div>
                                 </div>
-
                             </div>
                         </div>
-
-
-
                     </div>
                 </div>
             </div>
@@ -181,185 +172,6 @@ $accountType = getAccountType($conn, $empNo);
         <?php include("../includes/_footer.php"); ?>
         <!-- partial -->
     </div>
-    </div>
-
-
-    <!-- Edit user modal -->
-    <div class="modal fade" id="edit-user-modal" tabindex="-1" aria-labelledby="edit-user-modal-label" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="edit-user-modal-label">Edit User Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-
-                <form id="edit-user-form">
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-
-                                <div class="mb-3">
-                                    <label for="edit-user-firstName" class="form-label">First Name</label>
-                                    <input type="text" class="form-control" id="edit-user-firstName" name="firstName">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit-user-middleName" class="form-label">Middle Name</label>
-                                    <input type="text" class="form-control" id="edit-user-middleName" name="Name">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit-user-lastName" class="form-label">Last Name</label>
-                                    <input type="text" class="form-control" id="edit-user-lastName" name="lastName">
-                                </div>
-
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="edit-user-gender">
-                                                Gender
-                                            </label>
-                                            <select class="select2" style="width: 100%; height: 44px;" id="edit-user-gender" name="gender" required>
-                                                <option value="" disabled selected hidden>Please select</option>
-                                                <option value="male">Male</option>
-                                                <option value="female">Female</option>
-                                                <option value="other">Other</option>
-                                                <option value="not-say">Prefer not to say</option>
-                                            </select>
-                                        </div>
-
-                                        <style>
-                                            .select2 {
-                                                padding: 8px;
-                                                font-size: 14px;
-                                                border: 1px solid #ccc;
-                                                border-radius: 5px;
-                                                appearance: none;
-                                                -webkit-appearance: none;
-                                                -moz-appearance: none;
-                                            }
-                                        </style>
-                                    </div>
-
-
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="edit-user-DOB">
-                                                Date of birth
-                                            </label>
-                                            <input type="date" class="form-control" id="edit-user-DOB" name="DOB" required style="width: 100%; height: 44px;">
-                                        </div>
-                                    </div>
-
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="edit-user-phoneNumber">Phone
-                                        Number</label>
-                                    <input type="tel" class="form-control" id="edit-user-phoneNumber" pattern="[0-9]{11}" name="phoneNumber">
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="edit-user-address">Home address </label>
-                                    <input type="text" class="form-control" id="edit-user-address" required name="address">
-                                </div>
-
-                                <!-- <script>
-                                        // Wait for the page to load
-                                        document.addEventListener('DOMContentLoaded', function() {
-                                            // Create the Autocomplete object with UK address restrictions
-                                            const autocomplete = new google.maps.places.Autocomplete(
-                                                document.getElementById('edit-user-address'), {
-                                                    types: ['geocode'], // Only return geocoding results (addresses)
-                                                    componentRestrictions: {
-                                                        country: 'GB'
-                                                    } // Restrict to UK addresses
-                                                });
-
-                                            // Add an event listener to update the input field with the formatted address when a place is selected
-                                            autocomplete.addListener('place_changed', function() {
-                                                const place = autocomplete.getPlace();
-                                                document.getElementById('edit-user-address').value = place.formatted_address;
-                                            });
-                                        });
-                                    </script> -->
-                            </div>
-
-
-                            <div class="col-md-6">
-
-                                <div class="form-group">
-                                    <label for="edit-user-accountType">
-                                        Account Type
-                                    </label>
-                                    <select class="select2" style="width: 100%; height: 44px;" id="edit-user-accountType" name="accountType" required>
-                                        <option value="" disabled selected hidden>Please select</option>
-                                        <option value="Employee">Employee</option>
-                                        <option value="Manager">Manager</option>
-                                        <option value="Administrator">Administrator</option>
-                                    </select>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="edit-user-empNo" class="form-label">Employee No.</label>
-                                    <input type="text" class="form-control" id="edit-user-empNo" name="empNo" readonly>
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="edit-user-teams">
-                                        Search Teams
-                                    </label>
-                                    <input type="text" class="form-control" id="edit-user-teams" name="teams" placeholder="Search Teams" list="teamList" required />
-
-                                    <datalist id="teamList">
-                                        <option value="Team 1">
-                                        <option value="Team 2">
-                                        <option value="Team 3">
-                                            <!-- Add more options for each team -->
-                                    </datalist>
-                                </div>
-
-                                <script>
-                                    const searchField = document.getElementById("teamSearch");
-                                    const optionsList = document.querySelectorAll("#teamList option");
-
-                                    searchField.addEventListener("input", function() {
-                                        let options = "";
-                                        optionsList.forEach(function(option) {
-                                            if (option.value.toLowerCase().includes(searchField.value.toLowerCase())) {
-                                                options += "<option value='" + option.value + "'>" + option.value + "</option>";
-                                            }
-                                        });
-                                        searchField.setAttribute("list", "teamList");
-                                        document.getElementById("teamList").innerHTML = options;
-                                    });
-                                </script>
-
-                                <div class="mb-3">
-                                    <label for="edit-user-email" class="form-label">Email</label>
-                                    <input type="email" class="form-control" id="edit-user-email" name="email">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit-user-password" class="form-label">Create a new password</label>
-                                    <input type="password" class="form-control" id="edit-user-password" name="password">
-                                </div>
-                                <div class="mb-3">
-                                    <label for="edit-user-confirmPassword" class="form-label">Confirm new password</label>
-                                    <input type="password" class="form-control" id="edit-user-confirmPassword" name="confirmPassword">
-                                </div>
-
-                            </div>
-                        </div>
-                        <hr>
-                    </div>
-                    <div class="modal-footer d-flex justify-content-center">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
-
-
-            </div>
-        </div>
     </div>
 
     <!-- container-scroller -->
@@ -374,13 +186,11 @@ $accountType = getAccountType($conn, $empNo);
     <script src="../js/dataTables.select.min.js"></script>
 
     <!-- End plugin js for this page -->
-    <!-- inject:js -->
     <script src="../js/off-canvas.js"></script>
     <script src="../js/hoverable-collapse.js"></script>
     <script src="../js/template.js"></script>
     <script src="../js/settings.js"></script>
     <script src="../js/todolist.js"></script>
-    <!-- endinject -->
     <!-- Custom js for this page-->
     <script src="../js/dashboard.js"></script>
     <script src="../js/Chart.roundedBarCharts.js"></script>
@@ -406,6 +216,7 @@ $accountType = getAccountType($conn, $empNo);
 
 
     <script>
+        // Loader script
         var loader = document.querySelector(".loader")
 
         window.addEventListener("load", vanish);
