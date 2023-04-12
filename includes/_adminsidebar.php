@@ -73,23 +73,7 @@
             </div>
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
-                <i class="icon-check menu-icon"></i>
-                <span class="menu-title">Approvals</span>
-                <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="icons">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../pages/icons/mdi.html">Active Approvals</a> <!-- Active Approvals Page -->
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../pages/icons/mdi.html">Complete Approvals</a> <!-- Complete Approvals Page -->
-                    </li>
-                </ul>
-            </div>
-        </li>
+        
 
         <li class="nav-item">
             <a class="nav-link" data-toggle="collapse" href="#auth" aria-expanded="false" aria-controls="auth">
@@ -100,13 +84,8 @@
             <div class="collapse" id="auth">
                 <ul class="nav flex-column sub-menu">
                     <li class="nav-item">
-                        <a class="nav-link" href="../reports/project_reports.php"> <!-- Project Reports Page -->
-                            Project Reports
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="../reports/user_reports.php"> <!-- User Reports Page -->
-                            User Reports
+                            System Reports
                         </a>
                     </li>
                 </ul>

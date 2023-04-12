@@ -364,7 +364,7 @@ function createProject($conn, $projectID, $projectName, $projectDescription, $pr
 
 
 
-function updateUserReport($conn, $userID, $tasksCompleted, $hoursWorked)
+function updateUserReport($conn, $userID, $tasksCompleted, $hoursWorked, $tasksAssigned)
 {
     $conn->begin_transaction();
 
@@ -386,8 +386,9 @@ function updateUserReport($conn, $userID, $tasksCompleted, $hoursWorked)
             $row = $result->fetch_assoc();
             $tasksCompleted += $row['tasksCompleted'];
             $hoursWorked += $row['hoursWorked'];
+            $tasksAssigned += $row['tasksAssigned'];
 
-            $sql = "UPDATE Reports SET tasksCompleted = ?, hoursWorked = ? WHERE userID = ?";
+            $sql = "UPDATE Reports SET tasksCompleted = ?, hoursWorked = ?, tasksAssigned = ? WHERE userID = ?";
             $stmt = $conn->stmt_init();
             if (!$stmt->prepare($sql)) {
                 $error = "SQL statement failed: " . $conn->error;
@@ -396,12 +397,12 @@ function updateUserReport($conn, $userID, $tasksCompleted, $hoursWorked)
                 exit();
             } else {
                 // Bind parameters
-                $stmt->bind_param("iii", $tasksCompleted, $hoursWorked, $userID);
+                $stmt->bind_param("iiii", $tasksCompleted, $hoursWorked, $tasksAssigned, $userID);
             }
         } else {
             // Insert new record
-            $sql = "INSERT INTO Reports (userID, tasksCompleted, hoursWorked)
-                    VALUES (?, ?, ?)";
+            $sql = "INSERT INTO Reports (userID, tasksCompleted, hoursWorked, tasksAssigned)
+                    VALUES (?, ?, ?, ?)";
             $stmt = $conn->stmt_init();
             if (!$stmt->prepare($sql)) {
                 $error = "SQL statement failed: " . $conn->error;
@@ -410,7 +411,7 @@ function updateUserReport($conn, $userID, $tasksCompleted, $hoursWorked)
                 exit();
             } else {
                 // Bind parameters
-                $stmt->bind_param("iii", $userID, $tasksCompleted, $hoursWorked);
+                $stmt->bind_param("iiii", $userID, $tasksCompleted, $hoursWorked, $tasksAssigned);
             }
         }
 
@@ -435,33 +436,38 @@ function updateUserReport($conn, $userID, $tasksCompleted, $hoursWorked)
 
 
 
+function createPasswordResetRequest($conn, $email)
+{
+    // Get UserID associated with the email from Users table
+    $stmt = $conn->prepare("SELECT UserID FROM Users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $userID = $row['UserID'];
 
+        // Insert password reset request into Approvals table
+        $requestType = "Password Reset Request";
+        $isActive = 1; // 1 for active, 0 for inactive
+        $stmt = $conn->prepare("INSERT INTO Approvals (userID, email, requestType, is_active) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("isss", $userID, $email, $requestType, $isActive);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        if ($stmt->execute()) {
+            // Password reset request created successfully
+            header("Location: resetPassword.php?success=" . urlencode("passwordrequestsent"));
+            exit();
+        } else {
+            // Failed to create password reset request
+            header("Location: resetPassword.php?error=" . urlencode("failedpasswordresetrequest"));
+            exit();
+        }
+    } else {
+        // Email not found in Users table
+        header("Location: resetPassword.php?error=" . urlencode("emailnotfound"));
+        exit();
+    }
+}
 
 
 function getFirstName($conn, $empNo)
@@ -585,110 +591,108 @@ function deleteUser($conn, $empNo)
 
 
 
+// function getUserStatus($conn,$userID) {
 
-
-function getUserStatus($conn,$userID) {
-
-    // Query to get the latest clocking record for the user
-    $query = "SELECT * FROM clockings WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
-    $result = mysqli_query($conn, $query);
+//     // Query to get the latest clocking record for the user
+//     $query = "SELECT * FROM clockings WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+//     $result = mysqli_query($conn, $query);
     
-    // Check if the user has any clocking records
-    if (mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
-        $clockOutTime = $row["clockOutTime"];
-        $breakEndTime = $row["breakEndTime"];
+//     // Check if the user has any clocking records
+//     if (mysqli_num_rows($result) > 0) {
+//         $row = mysqli_fetch_assoc($result);
+//         $clockOutTime = $row["clockOutTime"];
+//         $breakEndTime = $row["breakEndTime"];
         
-        // Check if the user is currently clocked in
-        if ($clockOutTime == NULL) {
-            // Check if the user is on break
-            if ($breakEndTime == NULL) {
-                return "Clocked In";
-            } else {
-                return "On Break";
-            }
-        } else {
-            return "Clocked Out";
-        }
-    } else {
-        return "Not Clocked In";
-    }
-}
+//         // Check if the user is currently clocked in
+//         if ($clockOutTime == NULL) {
+//             // Check if the user is on break
+//             if ($breakEndTime == NULL) {
+//                 return "Clocked In";
+//             } else {
+//                 return "On Break";
+//             }
+//         } else {
+//             return "Clocked Out";
+//         }
+//     } else {
+//         return "Not Clocked In";
+//     }
+// }
 
-function clockIn($conn, $userID) {
-    $stmt = mysqli_prepare($conn, "INSERT INTO clockings (UserID, clockInTime) VALUES (?, DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'))");
-    mysqli_stmt_bind_param($stmt, "i", $userID);
-    $success = mysqli_stmt_execute($stmt);
+// function clockIn($conn, $userID) {
+//     $stmt = mysqli_prepare($conn, "INSERT INTO clockings (UserID, clockInTime) VALUES (?, DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'))");
+//     mysqli_stmt_bind_param($stmt, "i", $userID);
+//     $success = mysqli_stmt_execute($stmt);
 
-    if ($success) {
-        return true;
-    } else {
-        $error = mysqli_stmt_error($stmt);
-        if (mysqli_errno($conn) == 1062) {
-            return "You have already clocked in";
-        } else {
-            return "Error: $error";
-        }
-    }
-}
+//     if ($success) {
+//         return true;
+//     } else {
+//         $error = mysqli_stmt_error($stmt);
+//         if (mysqli_errno($conn) == 1062) {
+//             return "You have already clocked in";
+//         } else {
+//             return "Error: $error";
+//         }
+//     }
+// }
 
-function clockOut($conn, $userID) {
+// function clockOut($conn, $userID) {
 
-    // Update the latest clocking record for the user with clock-out time
-    $query = "UPDATE clockings SET clockOutTime = NOW() WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
-    $result = mysqli_query($conn, $query);
+//     // Update the latest clocking record for the user with clock-out time
+//     $query = "UPDATE clockings SET clockOutTime = NOW() WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+//     $result = mysqli_query($conn, $query);
     
-    if ($result) {
-        return "Clocked Out Successfully";
-    } else {
-        return "Error: " . mysqli_error($conn);
-    }
-}
+//     if ($result) {
+//         return "Clocked Out Successfully";
+//     } else {
+//         return "Error: " . mysqli_error($conn);
+//     }
+// }
 
-function startBreak($conn, $userID) {
+// function startBreak($conn, $userID) {
 
-    // Update the latest clocking record for the user with break start time
-    $query = "UPDATE clockings SET breakStartTime = NOW() WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
-    $result = mysqli_query($conn, $query);
+//     // Update the latest clocking record for the user with break start time
+//     $query = "UPDATE clockings SET breakStartTime = NOW() WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+//     $result = mysqli_query($conn, $query);
     
-    if ($result) {
-        return "Break Started Successfully";
-    } else {
-        return "Error: " . mysqli_error($conn);
-    }
-}
+//     if ($result) {
+//         return "Break Started Successfully";
+//     } else {
+//         return "Error: " . mysqli_error($conn);
+//     }
+// }
 
-function endBreak($conn, $userID) {
+// function endBreak($conn, $userID) {
 
-    // Update the latest clocking record for the user with break end time
-    $query = "UPDATE clockings SET breakEndTime = NOW() WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
-    $result = mysqli_query($conn, $query);
+//     // Update the latest clocking record for the user with break end time
+//     $query = "UPDATE clockings SET breakEndTime = NOW() WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+//     $result = mysqli_query($conn, $query);
     
-    if ($result) {
-        // Calculate hours worked and break duration
-        $query = "SELECT clockInTime, clockOutTime, breakStartTime, breakEndTime FROM clockings WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
-        $result = mysqli_query($conn, $query);
-        $row = mysqli_fetch_assoc($result);
-        $clockInTime = strtotime($row["clockInTime"]);
-        $clockOutTime = strtotime($row["clockOutTime"]);
-        $breakStartTime = strtotime($row["breakStartTime"]);
-        $breakEndTime = strtotime($row["breakEndTime"]);
-        $hoursWorked = ($clockOutTime - $clockInTime - ($breakEndTime - $breakStartTime)) / 3600;
-        $breakDuration = ($breakEndTime - $breakStartTime) / 60;
+//     if ($result) {
+//         // Calculate hours worked and break duration
+//         $query = "SELECT clockInTime, clockOutTime, breakStartTime, breakEndTime FROM clockings WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+//         $result = mysqli_query($conn, $query);
+//         $row = mysqli_fetch_assoc($result);
+//         $clockInTime = strtotime($row["clockInTime"]);
+//         $clockOutTime = strtotime($row["clockOutTime"]);
+//         $breakStartTime = strtotime($row["breakStartTime"]);
+//         $breakEndTime = strtotime($row["breakEndTime"]);
+//         $hoursWorked = ($clockOutTime - $clockInTime - ($breakEndTime - $breakStartTime)) / 3600;
+//         $breakDuration = ($breakEndTime - $breakStartTime) / 60;
         
-        // Update the latest clocking record for the user with hours worked and break duration
-        $query = "UPDATE clockings SET hoursWorked = $hoursWorked, breakDuration = $breakDuration WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
-        $result = mysqli_query($conn, $query);
+//         // Update the latest clocking record for the user with hours worked and break duration
+//         $query = "UPDATE clockings SET hoursWorked = $hoursWorked, breakDuration = $breakDuration WHERE UserID = $userID ORDER BY ClockingsID DESC LIMIT 1";
+//         $result = mysqli_query($conn, $query);
         
-        if ($result) {
-            return "Break Ended Successfully";
-        } else {
-            return "Error: " . mysqli_error($conn);
-        }
-    } else {
-        return "Error: " . mysqli_error($conn);
-    }
-}
+//         if ($result) {
+//             return "Break Ended Successfully";
+//         } else {
+//             return "Error: " . mysqli_error($conn);
+//         }
+//     } else {
+//         return "Error: " . mysqli_error($conn);
+//     }
+// }
 
 function getClockingHistory($conn, $userID) {
     // Retrieve all clocking records for the user
@@ -732,6 +736,53 @@ function displayClockingHistory($conn,$userID) {
 
 
 
+// Function to get team members and their tasks completed from Users and Reports table by teamID
+function getUsersByTeamID($conn, $teamID) {
+
+    // Query to retrieve team members by teamID
+    $query = "SELECT UserID, firstName, lastName FROM Users WHERE FIND_IN_SET('$teamID', teams)";
+    $result = mysqli_query($conn, $query);
+
+    // Fetch the results into an associative array
+    $teamMembers = array();
+    while ($row = mysqli_fetch_assoc($result)) {
+        $userID = $row['UserID'];
+        $tasksCompleted = getTasksCompletedByUserID($conn, $userID);
+        $row['tasksCompleted'] = $tasksCompleted;
+        $teamMembers[] = $row;
+    }
+
+    // Close the database connection
+    mysqli_close($conn);
+
+    return $teamMembers;
+}
 
 
 
+// Function to get tasksCompleted from Reports table by userID
+function getTasksCompletedByUserID($conn, $userID) {
+    // Query to retrieve tasksCompleted by userID
+    $query = "SELECT tasksCompleted FROM Reports WHERE userID = '$userID'";
+    $result = mysqli_query($conn, $query);
+
+    // Fetch the tasksCompleted value
+    $row = mysqli_fetch_assoc($result);
+    $tasksCompleted = $row['tasksCompleted'];
+
+    return $tasksCompleted;
+}
+
+
+// Function to retrieve team name from Teams table using teamID
+function getTeamNameByTeamID($conn, $teamID)
+{
+    $query = "SELECT teamName FROM Teams WHERE teamID = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $teamID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $team = $result->fetch_assoc();
+    $stmt->close();
+    return $team['teamName'];
+}

@@ -1,6 +1,5 @@
-<!--
-PHP intergration
--->
+<!--Created by Kevin Titus on 2022-07-21.-->
+<!-- PHP intergration -->
 <?php
 require_once('../includes/functions.inc.php');
 // Make a database connection
@@ -12,9 +11,45 @@ $firstName = getFirstName($conn, $empNo);
 $userID = getUserId($conn, $empNo);
 $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
+
+
+// Find the corresponding UserID for the empNo
+$query = "SELECT UserID FROM Users WHERE empNo = ?";
+$stmt = $conn->prepare($query);
+$stmt->bind_param("i", $empNo);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+if ($row) {
+    $userID = $row['UserID'];
+
+    // Check for the latest clocking entry for the user
+    $query = "SELECT * FROM Clockings WHERE UserID = ? ORDER BY clockInTime DESC LIMIT 1";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $userID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+
+    if ($row) {
+        $status = $row['status'];
+    } else {
+        // Insert a new record with the status 'Clocked Out'
+        $status = "Clocked Out";
+        $query = "INSERT INTO Clockings (UserID, status) VALUES (?, ?)";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("is", $userID, $status);
+        $stmt->execute();
+    }
+} else {
+    // Handle user not found
+    echo "User not found";
+    exit();
+}
+
 ?>
 
-<!--Created by Kevin Titus on 2022-07-21.-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,32 +68,14 @@ $accountType = getAccountType($conn, $empNo);
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" type="text/css" href="../js/select.dataTables.min.css" />
 
-    <link rel="stylesheet" href="css/select2/select2.min.css">
-    <link rel="stylesheet" href="css/select2/">
-
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
-
-
-    <link href="~bulma-calendar/dist/css/bulma-calendar.min.css" rel="stylesheet">
-    <script src="~bulma-calendar/dist/js/bulma-calendar.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- End plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css" />
     <!-- endinject -->
     <link rel="shortcut icon" href="../images/favicon.ico" />
-
-
-    <script>
-        $(document).ready(function() {
-            $('.js-example-basic-single').select2();
-        });
-    </script>
-
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvUiP0DYjb3XiFw9toptx7gBtokfnyfFM&libraries=places"></script>
-
 
 </head>
 
@@ -105,7 +122,7 @@ $accountType = getAccountType($conn, $empNo);
 
         <div class="container-fluid page-body-wrapper">
 
-            
+
             <!-- partial:includes/_adminsidebar.php -->
             <?php include '../includes/_adminsidebar.php'; ?>
 
@@ -126,32 +143,80 @@ $accountType = getAccountType($conn, $empNo);
                                         $time = date('H:i');
                                         echo "<div>$date</div>";
                                         echo "<div>$time</div>";
-
-                                        // get user status
-                                        $status = getUserStatus($conn, $userID);
                                         ?>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="row justify-content-center mt-4">
-                                <div class="col-12 col-xl-8 text-center font-weight-bold">
-                                    <div style="font-size: 40px; font-weight: bold;"><?php echo $status; ?></div>
-
-
-
-
-                                </div>
+                            <p>User status: <span id="user-status"><?php echo $status; ?></span></p>
+                            <div id="clocking-buttons">
+                                <!-- The buttons will be loaded here via JavaScript -->
                             </div>
-                            <!-- content-wrapper ends -->
-                            <!-- partial:includes/_footer.php -->
-                            <?php include("../includes/_footer.php"); ?>
-                            <!-- partial -->
                         </div>
-                        <!-- main-panel ends -->
                     </div>
-                    <!-- page-body-wrapper ends -->
                 </div>
+
+                <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+                <script>
+                    const userID = <?php echo $userID; ?>;
+
+                    function loadButtonsAndStatus() {
+                        console.log('Loading buttons and status for user ID:', userID);
+                        $.ajax({
+                            url: 'get_clocking_buttons.php',
+                            method: 'POST',
+                            dataType: 'json',
+                            data: {
+                                userID: userID
+                            },
+                            success: function(response) {
+                                console.log('Successfully loaded buttons and status:', response); // Add this line
+                                $('#clocking-buttons').html(response.buttons);
+                                $('#user-status').text(response.status);
+                            },
+
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                console.error('Error loading buttons and status:', textStatus, errorThrown); // Update this line
+                            }
+
+                        });
+                    }
+
+                    $(document).ready(function() {
+                        loadButtonsAndStatus();
+
+                        $(document).on('click', '.clocking-action', function() {
+                            console.log('Button clicked:', this);
+                            const action = $(this).data('action');
+                            $.ajax({
+                                url: 'clocking_action.php',
+                                method: 'POST',
+                                dataType: 'text',
+                                data: {
+                                    userID: userID,
+                                    action: action
+                                },
+                                success: function(response) {
+                                    console.log('Clocking action success:', response);
+                                    loadButtonsAndStatus();
+                                },
+                                error: function(jqXHR, textStatus, errorThrown) {
+                                    console.error('Error performing clocking action:', textStatus, errorThrown);
+                                }
+                            });
+                        });
+                    });
+                </script>
+
+
+
+
+
+                <!-- content-wrapper ends -->
+                <!-- partial:includes/_footer.php -->
+                <?php include("../includes/_footer.php"); ?>
+                <!-- partial -->
+
+
 
                 <!-- container-scroller -->
 

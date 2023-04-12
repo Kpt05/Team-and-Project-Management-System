@@ -16,7 +16,7 @@
     <style>
         /* Style the video: 100% width and height to cover the entire window */
         #myVideo {
-            position: fixed; 
+            position: fixed;
             z-index: -1;
 
             /*right: 0;
@@ -46,7 +46,7 @@
             }
 
             body {
-                background-image: url("images/bg.png"); 
+                background-image: url("images/bg.png");
                 background-size: cover;
                 background-repeat: no-repeat;
             }
@@ -117,17 +117,17 @@
                                     </div>
                                 </div>
 
-                                <form action="includes/login.inc.php" method="POST" class="signin-form">   <!-- Path to the login.inc.php file (Contains the login handling code) -->
+                                <form action="includes/login.inc.php" method="POST" class="signin-form"> <!-- Path to the login.inc.php file (Contains the login handling code) -->
 
                                     <div class="form-group mb-3">
                                         <label class="label" for="Email">Email</label> <!-- Email label -->
-                                        <input type="email" class="form-control" placeholder="john.appleseed@sourcetech.net" required name="email" id="email" /> <!-- Email input -->
+                                        <input type="email" class="form-control" placeholder="john.appleseed@sourcetech.net" required name="email" id="email" maxlength="64" minlength="7" /> <!-- Email input with length checks -->
                                     </div>
 
                                     <div class="form-group mb-3">
                                         <label class="label" for="Password">Password</label> <!-- Password label -->
                                         <div class="position-relative">
-                                            <input type="password" class="form-control pr-5" placeholder="Password" required name="password" id="password" /> <!-- Password input -->
+                                            <input type="password" class="form-control pr-5" placeholder="Password" required name="password" id="password" maxlength="64" minlength="5" /> <!-- Password input with length checks -->
                                             <span class="position-absolute top-50 translate-middle-y" style="right: 15px; top: 10px;" id="password-toggle">
                                                 <i class="fa fa-eye"></i>
                                             </span>
@@ -145,8 +145,9 @@
                                             </label>
                                         </div>
                                         <div class="w-50 text-md-right">
-                                            <a href="mailto:forgotpassword.admin@sourcetech.net?subject=Forgot Password ~ Source Tech Login">Forgot Password</a> <!-- When clicked, the user will be redirected to the email client with the email address and subject already filled in -->
+                                            <a href="forgotPassword.php">Forgot Password</a> <!-- When clicked, the user will be redirected to "forgotPassword.php" file -->
                                         </div>
+
                                     </div>
 
                                     <?php
@@ -186,7 +187,6 @@
                                     </script>
 
                                 </form>
-
 
                                 <style>
                                     .error-message {

@@ -50,23 +50,7 @@
             </div>
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#icons" aria-expanded="false" aria-controls="icons">
-                <i class="icon-check menu-icon"></i>
-                <span class="menu-title">Approvals</span> <!-- Sub item, which shows approvals -->
-                <i class="menu-arrow"></i>
-            </a>
-            <div class="collapse" id="icons">
-                <ul class="nav flex-column sub-menu">
-                    <li class="nav-item">
-                        <a class="nav-link" href="../pages/icons/mdi.html">Active Approvals</a> <!-- Active Approvals page -->
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="../pages/icons/mdi.html">Complete Approvals</a> <!-- Complete Approvals page -->
-                    </li>
-                </ul>
-            </div>
-        </li>
+       
 
         <!-- Clockings item, which links to the clockings page -->
         <li class="nav-item">

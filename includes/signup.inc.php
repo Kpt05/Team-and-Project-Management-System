@@ -21,9 +21,6 @@ $password = $_POST['password'];
 $confirmPassword = $_POST['confirmPassword'];
 
 
-
-
-
 $teamName = $_POST['teamName'];
 $department = $_POST['department'];
 $teamDescription = $_POST['teamDescription'];
@@ -77,7 +74,10 @@ while (true) {
 
 $userID = $_POST['userID'];
 $tasksCompleted = $_POST['tasksCompleted'];
+$tasksAssigned = $_POST['tasksAssigned'];
 $hoursWorked = $_POST['hoursWorked'];
+
+
 
 
 //Check if submit button is clicked
@@ -114,9 +114,6 @@ if (isset($_POST['submit'])) {
     //Create a system user
     createUser($conn, $firstName, $middleName, $lastName, $gender, $DOB, $phoneNumber, $address, $accountType, $empNo, $teams, $email, $password);
     exit();
-
-
-
 } else if (isset($_POST['createTeam'])) {
 
     //Function call to check for empty fields
@@ -143,8 +140,6 @@ if (isset($_POST['submit'])) {
     createTeam($conn, $teamID, $teamName, $teamDescription, $department, $teamLeadID, $teamLead);
     exit();
 
-
-
 } else if (isset($_POST['createProject'])) {
 
     //Function call to check for empty fields
@@ -170,16 +165,45 @@ if (isset($_POST['submit'])) {
     //Create a project
     createProject($conn, $projectID, $projectName, $projectDescription, $priorityLevel, $projectStatus, $teamID, $projectLeadID);
     exit();
-}
-
-
-
-
-
- else if (isset($_POST['userPerformance'])) {
+} else if (isset($_POST['userPerformance'])) {
 
     //Create a task
-    updateUserReport($conn, $userID, $tasksCompleted, $hoursWorked);
+    updateUserReport($conn, $userID, $tasksCompleted, $hoursWorked, $tasksAssigned);
+    exit();
+
+
+
+
+
+
+} else if (isset($_POST['resetRequest'])) {
+
+    // Function call to check if email already exists
+    if (!emailExists($conn, $email)) {
+        header("Location: ../forgotPassword.php?error=emaildoesnotexist&message=" . urlencode("Email does not exist."));
+        exit();
+    }
+
+    //Create a password reset request
+    createPasswordResetRequest($conn, $email);
     exit();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

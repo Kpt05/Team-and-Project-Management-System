@@ -147,11 +147,18 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the log
                                                 </select>
                                             </div>
 
+
+                                            <div class="form-group">
+                                                <label for="tasksAssigned">Tasks Assigned:</label> <!-- Tasks assigned label -->
+                                                <input type="text" class="form-control" id="tasksAssigned" name="tasksAssigned" required inputmode="numeric" pattern="[0-9]*">
+                                            </div>
+                                            
                                             <div class="form-group">
                                                 <label for="tasksCompleted">Tasks Completed:</label> <!-- Tasks completed label -->
                                                 <input type="text" class="form-control" id="tasksCompleted" name="tasksCompleted" required inputmode="numeric" pattern="[0-9]*">
                                             </div>
 
+                                        
                                             <div class="form-group">
                                                 <label for="hoursWorked">Hours Worked:</label> <!-- Hours worked label -->
                                                 <input type="number" class="form-control" id="hoursWorked" name="hoursWorked" required>
@@ -159,6 +166,7 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the log
 
                                             <button type="submit" name="userPerformance" class="btn btn-primary">Submit</button> <!-- Submit button -->
                                         </form>
+
 
                                     </div>
                                 </div>

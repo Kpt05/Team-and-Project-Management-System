@@ -1,19 +1,18 @@
-<!--
-PHP intergration
--->
+<!--Created by Kevin Titus on 2022-07-21.-->
+<!-- PHP intergration -->
 <?php
-require_once('../includes/functions.inc.php');
+require_once('../includes/functions.inc.php'); // Including functions.inc.php to use functions
 // Make a database connection
-$conn = require '../includes/dbconfig.php';
+$conn = require '../includes/dbconfig.php'; // dbconfig.php to connect to the database
 
+// Start session
 session_start();
-$empNo = $_SESSION['empNo'];
-$firstName = getFirstName($conn, $empNo);
-$lastName = getLastName($conn, $empNo);
-$accountType = getAccountType($conn, $empNo);
+$empNo = $_SESSION['empNo']; // Get the employee number from the session
+$firstName = getFirstName($conn, $empNo); // Get the first name of the user
+$lastName = getLastName($conn, $empNo); // Get the last name of the user
+$accountType = getAccountType($conn, $empNo); // Get the account type of the user
 ?>
 
-<!--Created by Kevin Titus on 2022-07-21.-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -23,45 +22,43 @@ $accountType = getAccountType($conn, $empNo);
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>Source Tech Portal</title>
     <!-- plugins:css -->
-    <link rel="stylesheet" href="../vendors/feather/feather.css" />
-    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
-    <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css" />
-    <!-- endinject -->
+    <link rel="stylesheet" href="../vendors/feather/feather.css" /> <!-- Feather icons -->
+    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" /> <!-- Themify icons -->
+    <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css" /> <!-- Vendor css -->
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
-    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
-    <link rel="stylesheet" type="text/css" href="../js/select.dataTables.min.css" />
+    <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css" /> <!-- Data tables -->
+    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" /> <!-- Themify icons -->
+    <link rel="stylesheet" type="text/css" href="../js/select.dataTables.min.css" /> <!-- Data tables -->
 
-    <link rel="stylesheet" href="css/select2/select2.min.css">
-    <link rel="stylesheet" href="css/select2/">
+    <link rel="stylesheet" href="css/select2/select2.min.css"> <!-- Select2 -->
+    <link rel="stylesheet" href="css/select2/"> <!-- Select2 Styling-->
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" /> <!-- Select2 -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script> <!-- Select2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css"> <!-- Bootstrap icons -->
 
-
-    <link href="~bulma-calendar/dist/css/bulma-calendar.min.css" rel="stylesheet">
-    <script src="~bulma-calendar/dist/js/bulma-calendar.min.js"></script>
+    <link href="~bulma-calendar/dist/css/bulma-calendar.min.css" rel="stylesheet"> <!-- Bulma Calendar -->
+    <script src="~bulma-calendar/dist/js/bulma-calendar.min.js"></script> <!-- Bulma Calendar -->
 
     <!-- End plugin css for this page -->
-    <!-- inject:css -->
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css" />
     <!-- endinject -->
-    <link rel="shortcut icon" href="../images/favicon.ico" />
+    <link rel="shortcut icon" href="../images/favicon.ico" /> <!-- Favicon -->
 
 
     <script>
+        // Script to make the loader disappear
         $(document).ready(function() {
             $('.js-example-basic-single').select2();
         });
     </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvUiP0DYjb3XiFw9toptx7gBtokfnyfFM&libraries=places"></script>
-
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvUiP0DYjb3XiFw9toptx7gBtokfnyfFM&libraries=places"></script> <!-- Uses Google Maps API to get the address and use autocomplete suggestions -->
 
 </head>
 
 <style>
+    /* Loader styling */
     * {
         margin: 0;
         padding: 0;
@@ -93,6 +90,7 @@ $accountType = getAccountType($conn, $empNo);
 </style>
 
 <body>
+    <!-- Loader -->
     <div class="loader">
         <img src="../images/loader.gif" alt="" />
     </div>
@@ -100,12 +98,12 @@ $accountType = getAccountType($conn, $empNo);
     <div class="container-scroller">
 
         <!-- partial:includes/_navbar.php -->
-        <?php include "../includes/_navbar.php"; ?>
+        <?php include "../includes/_navbar.php"; ?> <!-- Navbar -->
 
         <div class="container-fluid page-body-wrapper">
 
             <!-- partial:includes/_adminsidebar.php -->
-            <?php include '../includes/_adminsidebar.php'; ?>
+            <?php include '../includes/_adminsidebar.php'; ?> <!-- Sidebar -->
 
             <!-- partial -->
             <div class="main-panel">
@@ -114,16 +112,16 @@ $accountType = getAccountType($conn, $empNo);
                         <div class="col-md-12 grid-margin">
                             <div class="row">
                                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-                                    <h3 class="font-weight-bold">Create system user</h3>
+                                    <h3 class="font-weight-bold">Create system user</h3> <!-- Page title -->
                                 </div>
                                 <div class="row"></div>
                                 <div class="col-lg-12 grid-margin stretch-card">
                                     <div class="card">
                                         <div class="card-body">
-                                            <h4 class="card-title">Personal Details</h4>
+                                            <h4 class="card-title">Personal Details</h4> <!-- Card title -->
                                             <div class="container-fluid">
 
-                                                <form action="../includes/signup.inc.php" method="POST">
+                                                <form action="../includes/signup.inc.php" method="POST"> <!-- When the form is submitted, form data will go to the signup.inc.php file -->
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <div class="row">
@@ -131,23 +129,23 @@ $accountType = getAccountType($conn, $empNo);
 
                                                                     <div class="form-group">
                                                                         <label for="firstName">
-                                                                            First Name <span style="color: red;">*</span>
+                                                                            First Name <span style="color: red;">*</span> <!-- Required field -->
                                                                         </label>
-                                                                        <input type="text" class="form-control" id="firstName" name="firstName" required />
+                                                                        <input type="text" class="form-control" id="firstName" name="firstName" required /> <!-- First name input -->
                                                                     </div>
 
                                                                     <div class="form-group">
                                                                         <label for="middleName">
                                                                             Middle Name
                                                                         </label>
-                                                                        <input type="text" class="form-control" id="middleName" name="middleName" />
+                                                                        <input type="text" class="form-control" id="middleName" name="middleName" /> <!-- Middle name input -->
                                                                     </div>
 
                                                                     <div class="form-group">
                                                                         <label for="lastName">
                                                                             Last Name <span style="color: red;">*</span>
                                                                         </label>
-                                                                        <input type="text" class="form-control" id="lastName" name="lastName" required />
+                                                                        <input type="text" class="form-control" id="lastName" name="lastName" required /> <!-- Last name input -->
                                                                     </div>
 
 
@@ -155,9 +153,9 @@ $accountType = getAccountType($conn, $empNo);
                                                                         <div class="col-md-6">
                                                                             <div class="form-group">
                                                                                 <label for="gender">
-                                                                                    Gender <span style="color: red;">*</span>
+                                                                                    Gender <span style="color: red;">*</span> <!-- Required field -->
                                                                                 </label>
-                                                                                <select class="select2" style="width: 100%; height: 38px;" id="gender" name="gender" required>
+                                                                                <select class="select2" style="width: 100%; height: 38px;" id="gender" name="gender" required> <!-- Dropdown list to select the user's gender -->
                                                                                     <option value="" disabled selected hidden>Please select</option>
                                                                                     <option value="male">Male</option>
                                                                                     <option value="female">Female</option>
@@ -167,6 +165,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                             </div>
 
                                                                             <style>
+                                                                                /* Dropdown styling */
                                                                                 .select2 {
                                                                                     padding: 8px;
                                                                                     font-size: 14px;
@@ -185,7 +184,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                                 <label for="DOB">
                                                                                     Date of birth <span style="color: red;">*</span>
                                                                                 </label>
-                                                                                <input type="date" class="form-control" id="DOB" name="DOB" required />
+                                                                                <input type="date" class="form-control" id="DOB" name="DOB" required /> <!-- Date of birth input -->
                                                                             </div>
                                                                         </div>
 
@@ -194,19 +193,20 @@ $accountType = getAccountType($conn, $empNo);
                                                                     <div class="form-group">
                                                                         <label for="phoneNumber">Phone
                                                                             Number</label>
-                                                                        <input type="tel" class="form-control" id="phoneNumber" pattern="[0-9]{11}" name="phoneNumber">
+                                                                        <input type="tel" class="form-control" id="phoneNumber" pattern="[0-9]{11}" name="phoneNumber"> <!-- Phone number input that only accepts numbers -->
                                                                     </div>
 
                                                                     <div class="form-group">
-                                                                        <label for="addressInput">Home address <span style="color: red;">*</span></label>
-                                                                        <input type="text" class="form-control" id="address" required name="address">
+                                                                        <label for="addressInput">Home address <span style="color: red;">*</span></label> <!-- Required field -->
+                                                                        <input type="text" class="form-control" id="address" required name="address"> <!-- Address input -->
                                                                     </div>
 
                                                                     <script>
+                                                                        // Uses the Google Maps API to autocomplete the address input
                                                                         // Wait for the page to load
                                                                         document.addEventListener('DOMContentLoaded', function() {
                                                                             // Create the Autocomplete object with UK address restrictions
-                                                                            const autocomplete = new google.maps.places.Autocomplete(
+                                                                            const autocomplete = new google.maps.places.Autocomplete( 
                                                                                 document.getElementById('address'), {
                                                                                     types: ['geocode'], // Only return geocoding results (addresses)
                                                                                     componentRestrictions: {
@@ -215,14 +215,15 @@ $accountType = getAccountType($conn, $empNo);
                                                                                 });
 
                                                                             // Add an event listener to update the input field with the formatted address when a place is selected
-                                                                            autocomplete.addListener('place_changed', function() {
-                                                                                const place = autocomplete.getPlace();
-                                                                                document.getElementById('address').value = place.formatted_address;
+                                                                            autocomplete.addListener('place_changed', function() { // When a place is selected
+                                                                                const place = autocomplete.getPlace(); // Get the place details
+                                                                                document.getElementById('address').value = place.formatted_address; // Update the address input with the formatted address
                                                                             });
                                                                         });
                                                                     </script>
 
                                                                     <style>
+                                                                        /* Styling for the address input */
                                                                         .form-group {
                                                                             margin-bottom: 1rem;
                                                                         }
@@ -247,9 +248,9 @@ $accountType = getAccountType($conn, $empNo);
 
                                                                     <div class="form-group">
                                                                         <label for="accountType">
-                                                                            Account Type <span style="color: red;">*</span>
+                                                                            Account Type <span style="color: red;">*</span> <!-- Required field -->
                                                                         </label>
-                                                                        <select class="select3" style="width: 100%;" id="accountType" name="accountType" required>
+                                                                        <select class="select3" style="width: 100%;" id="accountType" name="accountType" required> <!-- Dropdown list to select the user's account type -->
                                                                             <option value="" disabled selected hidden>Please select</option>
                                                                             <option value="Employee">Employee</option>
                                                                             <option value="Manager">Manager</option>
@@ -259,6 +260,7 @@ $accountType = getAccountType($conn, $empNo);
 
 
                                                                     <style>
+                                                                        /* Dropdown styling */
                                                                         .select3 {
                                                                             padding: 8px;
                                                                             font-size: 14px;
@@ -273,17 +275,18 @@ $accountType = getAccountType($conn, $empNo);
 
                                                                     <div class="form-group">
                                                                         <label for="empNo">
-                                                                            Employee Number <span style="color: red;">*</span>
+                                                                            Employee Number <span style="color: red;">*</span> <!-- Required field -->
                                                                         </label>
-                                                                        <input type="text" class="form-control" id="empNo" placeholder="Enter a 13 digit number" pattern="[0-9]{13}" name="empNo" required>
+                                                                        <input type="text" class="form-control" id="empNo" placeholder="Enter a 13 digit number" pattern="[0-9]{13}" name="empNo" required> <!-- Employee number input that only accepts numbers -->
                                                                     </div>
 
                                                                     
                                                                     <div class="form-group">
                                                                     <label for="teams">Team ID: <span style="color: red;">*</span></label>
-                                                                    <input type="text" class="form-control" id="teams" name="teams" placeholder="Search for a team ID" list="teamList1" required>
+                                                                    <input type="text" class="form-control" id="teams" name="teams" placeholder="Search for a team ID" list="teamList1" required> <!-- Team ID input that only accepts numbers -->
 
                                                                     <datalist id="teamList1">
+                                                                        <!-- Datalist to display all team IDs -->
                                                                         <?php
                                                                         // Query the teams table to get all teamIDs
                                                                         $sql = "SELECT teamID FROM Teams";
@@ -297,6 +300,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                     </datalist>
 
                                                                     <script>
+                                                                        // Creates an active search for the datalist
                                                                         // Listen for changes on the datalist input
                                                                         document.getElementById("teamID").addEventListener("input", function() {
                                                                             // Get the selected option and set the hidden input value to the corresponding data-value attribute
@@ -310,17 +314,16 @@ $accountType = getAccountType($conn, $empNo);
 
                                                                     <div class="form-group">
                                                                         <label class="label" for="email">Email <span style="color: red;">*</span></label>
-                                                                        <input type="email" class="form-control" placeholder="example.1234@sourcetech.net" required name="email" id="email" />
+                                                                        <input type="email" class="form-control" placeholder="example.1234@sourcetech.net" required name="email" id="email" /> <!-- Email input -->
                                                                     </div>
                                                                     <div class="form-group">
                                                                         <label for="password">Create a password <span style="color: red;">*</span></label>
-                                                                        <input type="password" class="form-control" placeholder="Password" required name="password" id="password" />
+                                                                        <input type="password" class="form-control" placeholder="Password" required name="password" id="password" /> <!-- Password input -->
                                                                     </div>
                                                                     <div class="form-group">
                                                                         <label for="confirmPassword">Confirm Password <span style="color: red;">*</span></label>
-                                                                        <input type="password" class="form-control" placeholder="Enter your password again" required name="confirmPassword" id="confirmPassword" />
+                                                                        <input type="password" class="form-control" placeholder="Enter your password again" required name="confirmPassword" id="confirmPassword" /> <!-- Confirm password input -->
                                                                     </div>
-
 
                                                                 </div>
                                                             </div>
@@ -350,7 +353,7 @@ $accountType = getAccountType($conn, $empNo);
                                                             <!-- End of error message -->
 
                                                             
-                                                            <button type="submit" name="submit" class="form-control btn     btn-primary rounded submit px-3">
+                                                            <button type="submit" name="submit" class="form-control btn     btn-primary rounded submit px-3"> <!-- Submit button -->
                                                                 <b>Add user</b>
                                                             </button>
 
@@ -363,12 +366,10 @@ $accountType = getAccountType($conn, $empNo);
                                 </div>
                             </div>
 
-
-
                             <!-- content-wrapper ends -->
 
                             <!-- partial:includes/_footer.php -->
-                            <?php include("../includes/_footer.php"); ?>
+                            <?php include("../includes/_footer.php"); ?> <!-- Footer -->
                             <!-- partial -->
                         </div>
                         <!-- main-panel ends -->
@@ -387,19 +388,18 @@ $accountType = getAccountType($conn, $empNo);
                 <script src="../js/dataTables.select.min.js"></script>
 
                 <!-- End plugin js for this page -->
-                <!-- inject:js -->
                 <script src="../js/off-canvas.js"></script>
                 <script src="../js/hoverable-collapse.js"></script>
                 <script src="../js/template.js"></script>
                 <script src="../js/settings.js"></script>
                 <script src="../js/todolist.js"></script>
-                <!-- endinject -->
                 <!-- Custom js for this page-->
                 <script src="../js/dashboard.js"></script>
                 <script src="../js/Chart.roundedBarCharts.js"></script>
                 <!-- End custom js for this page-->
 
                 <script>
+                    // Loader script for page
                     var loader = document.querySelector(".loader")
 
                     window.addEventListener("load", vanish);
@@ -410,6 +410,7 @@ $accountType = getAccountType($conn, $empNo);
                 </script>
 
                 <script>
+                    // Script to set the max and min date for the date of birth input
                     $(function() {
                         var sixteenYearsAgo = new Date();
                         var hundredYearsAgo = new Date();
@@ -424,14 +425,9 @@ $accountType = getAccountType($conn, $empNo);
                         $('#DOB').val(maxDate);
                     });
                 </script>
-
             </div>
         </div>
     </div>
 
-
 </body>
-
-
-
 </html>

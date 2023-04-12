@@ -1,3 +1,16 @@
+<!-- PHP intergration -->
+<?php
+// Including functions.inc.php to use functions and dbconfig.php to connect to the database
+require_once('../includes/functions.inc.php');
+$conn = require '../includes/dbconfig.php';
+
+// Start session
+session_start();
+$empNo = $_SESSION['empNo'];
+$firstName = getFirstName($conn, $empNo);
+$lastName = getLastName($conn, $empNo);
+$accountType = getAccountType($conn, $empNo);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,7 +18,7 @@
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Skydash Admin</title>
+    <title>Personal Reports | Source Tech Portal</title>
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
@@ -70,6 +83,21 @@
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
+                <div class="row">
+                        <div class="col-md-12 grid-margin">
+                            <div class="row">
+                                <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                                    <h2 class="font-weight-bold">View Personal Reports</h2> <!-- Page title -->
+
+                                    <h4 class="font-weight-bold mb-0">
+                                        Welcome, <?php echo $firstName ?> <!-- Welcome message -->
+                                    </h4>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-lg-6 grid-margin stretch-card">
                             <div class="card">
@@ -88,42 +116,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-6 grid-margin stretch-card">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Area chart</h4>
-                                    <canvas id="areaChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 grid-margin stretch-card">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Doughnut chart</h4>
-                                    <canvas id="doughnutChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-lg-6 grid-margin grid-margin-lg-0 stretch-card">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Pie chart</h4>
-                                    <canvas id="pieChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 grid-margin grid-margin-lg-0 stretch-card">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Scatter chart</h4>
-                                    <canvas id="scatterChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
                 <!-- content-wrapper ends -->
 

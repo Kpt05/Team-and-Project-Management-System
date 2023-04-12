@@ -32,19 +32,33 @@ $employee_count = $row['count'];
 
 $total_users = $admin_count + $manager_count + $employee_count; // Total number of users
 
-// Query to retrieve data from Reports table, including tasksCompleted, hoursWorked, and userID
-$sql = "SELECT tasksCompleted, hoursWorked, userID FROM Reports";
+
+
+// Query the database to retrieve data for the chart
+$sql = "SELECT r.userID, u.firstName, u.lastName, r.tasksCompleted, r.tasksAssigned, r.hoursWorked FROM Reports r
+        INNER JOIN Users u ON r.userID = u.userID"; // Join with Users table to get full names
 $result = $conn->query($sql);
 
-// Create a 3D array to store the data for the chart
-$data = array();
+// Create a 3D array to store the chart data
+$chartData = array();
 while ($row = $result->fetch_assoc()) {
-    $efficiencyRate = ($row['tasksCompleted'] / $row['hoursWorked']) * 100; // Calculate efficiency rate
-    $userSql = "SELECT CONCAT(firstName, ' ', lastName) AS fullName FROM Users WHERE userID = " . $row['userID']; // Query to retrieve full name of user
-    $userResult = $conn->query($userSql); 
-    $userRow = $userResult->fetch_assoc();
-    $fullName = $userRow['fullName'];
-    $data[] = array($fullName, $efficiencyRate); // Add data to array
+    $efficiencyRate = ($row["tasksCompleted"] / $row["hoursWorked"]) * 100;
+    $fullName = $row["firstName"] . " " . $row["lastName"]; // Concatenate first name and last name
+    $chartData[] = array(
+        "userID" => $fullName, // Use full name as label on x-axis
+        "efficiencyRate" => $efficiencyRate
+    );
+}
+
+// Bubble sort to sort the chart data in ascending order based on efficiency rate
+for ($i = 0; $i < count($chartData) - 1; $i++) {
+    for ($j = 0; $j < count($chartData) - $i - 1; $j++) {
+        if ($chartData[$j]["efficiencyRate"] > $chartData[$j + 1]["efficiencyRate"]) {
+            $temp = $chartData[$j];
+            $chartData[$j] = $chartData[$j + 1];
+            $chartData[$j + 1] = $temp;
+        }
+    }
 }
 ?>
 
@@ -68,7 +82,7 @@ while ($row = $result->fetch_assoc()) {
     <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css" />
     <!-- End plugin css for this page -->
-   
+
     <link rel="stylesheet" href="css/vertical-layout-light/style.css" />
     <!-- endinject -->
     <link rel="shortcut icon" href="images/favicon.ico" />
@@ -107,8 +121,8 @@ while ($row = $result->fetch_assoc()) {
 </style>
 
 <body>
-<!-- Loader --> 
-    <div class="loader"> 
+    <!-- Loader -->
+    <div class="loader">
         <img src="images/loader.gif" alt="" />
     </div>
 
@@ -119,7 +133,7 @@ while ($row = $result->fetch_assoc()) {
 
         <div class="container-fluid page-body-wrapper">
 
-            
+
             <!-- partial - Account Type Based Navbar -->
             <?php
             if ($accountType == 'Employee') {
@@ -257,81 +271,21 @@ while ($row = $result->fetch_assoc()) {
 
                     <div class="row">
 
-                        <!-- Chart to display the efficiency rate of each user -->
-                        <div class="col-md-8 grid-margin stretch-card">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4 class="card-title">Efficiency Rate by User</h4>
-                                    <h6 class="card-subtitle mb-2 text-muted">Efficiency Rate = (Number of Tasks Completed / Total Hours Worked) * 100</h6>
-                                    <canvas id="efficiencyChart"></canvas>
+                        <div class="row">
+                            <!-- Chart to display the efficiency rate of each user -->
+                            <!-- Add the canvas element to render the chart -->
+                            <div class="col-md-9 grid-margin stretch-card">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h4 class="card-title">Efficiency Rate Chart</h4> <!-- Added chart title -->
+                                        <canvas id="efficiencyChart"></canvas>
+                                        <p class="chart-description">Efficiency Rate = (Completed Tasks / Total Tasks) * 100</p> <!-- Added chart description with formula -->
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-
-                        <!-- Script to create the chart using Charts.js -->
-                        <script>
-                            // Get the data from the PHP array
-                            var data = <?php echo json_encode($data); ?>;
-
-                            // Function to perform bubble sort on the data array by efficiency rate in ascending order
-                            function bubbleSort(arr) {
-                                var len = arr.length;
-                                for (var i = 0; i < len - 1; i++) {
-                                    for (var j = 0; j < len - i - 1; j++) {
-                                        if (arr[j][1] > arr[j + 1][1]) {
-                                            var temp = arr[j];
-                                            arr[j] = arr[j + 1];
-                                            arr[j + 1] = temp;
-                                        }
-                                    }
-                                }
-                                return arr;
-                            }
-
-                            // Sort the data array by efficiency rate in ascending order using bubble sort
-                            data = bubbleSort(data);
-
-                            // Extract the full names and efficiency rates from the sorted data array
-                            var labels = data.map(function(item) {
-                                return item[0];
-                            });
-                            var efficiencyRates = data.map(function(item) {
-                                return item[1];
-                            });
-
-                            // Create a chart using Charts.js
-                            var ctx = document.getElementById('efficiencyChart').getContext('2d');
-                            var chart = new Chart(ctx, {
-                                type: 'bar',
-                                data: {
-                                    labels: labels,
-                                    datasets: [{
-                                        label: 'Efficiency Rate',
-                                        data: efficiencyRates,
-                                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Set the color for the bars
-                                        borderColor: 'rgba(75, 192, 192, 1)', // Set the border color for the bars
-                                        borderWidth: 1 // Set the border width for the bars
-                                    }]
-                                },
-                                options: {
-                                    scales: {
-                                        x: {
-                                            beginAtZero: true,
-                                            max: 100 // Set the maximum value for the x-axis to 100
-                                        },
-                                        y: {
-                                            beginAtZero: true,
-                                            max: 100 // Set the maximum value for the y-axis to 100
-                                        }
-                                    }
-                                }
-                            });
-                        </script>
-
-                        <!-- To do list -->
-                        <div class="row">
-                            <div class="col-md-12 grid-margin stretch-card">
+                            <!-- To do list -->
+                            <div class="col-md-3 grid-margin stretch-card">
                                 <div class="card">
                                     <div class="card-body">
                                         <h4 class="card-title">To Do Lists</h4>
@@ -394,7 +348,53 @@ while ($row = $result->fetch_assoc()) {
                                 </div>
                             </div>
                         </div>
+
+
+                        <!-- JavaScript code to create the chart -->
+                        <script>
+                            var chartData = <?php echo json_encode($chartData); ?>; // Pass the PHP array to JavaScript
+
+                            // Prepare the data for the chart
+                            var chartLabels = chartData.map(function(item) {
+                                return item.userID;
+                            });
+                            var chartEfficiencyRate = chartData.map(function(item) {
+                                return item.efficiencyRate;
+                            });
+
+                            // Create the chart
+                            var ctx = document.getElementById("efficiencyChart").getContext("2d");
+                            var chart = new Chart(ctx, {
+                                type: 'bar',
+                                data: {
+                                    labels: chartLabels,
+                                    datasets: [{
+                                        label: 'Efficiency Rate',
+                                        data: chartEfficiencyRate,
+                                        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Set the background color for the bars
+                                        borderColor: 'rgba(75, 192, 192, 1)', // Set the border color for the bars
+                                        borderWidth: 1 // Set the border width for the bars
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            max: 100 // Set the maximum value for the y-axis to 100
+                                        }
+                                    }
+                                }
+                            });
+                        </script>
+
+
+
+
                     </div>
+
+
+
+
                     <!-- partial:includes/_footer.php -->
                     <?php include("includes/_footer.php"); ?>
                     <!-- partial -->
@@ -437,6 +437,8 @@ while ($row = $result->fetch_assoc()) {
                 loader.classList.add("disppear");
             }
         </script>
+    </div>
 
 </body>
+
 </html>

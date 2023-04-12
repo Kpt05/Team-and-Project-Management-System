@@ -1,19 +1,18 @@
-<!--
-PHP intergration
--->
+<!--Created by Kevin Titus on 2022-07-21.-->
+<!-- PHP intergration -->
 <?php
-require_once('../includes/functions.inc.php');
+require_once('../includes/functions.inc.php'); // Include the functions file, which contains the functions used in this file
 // Make a database connection
-$conn = require '../includes/dbconfig.php';
+$conn = require '../includes/dbconfig.php'; // Include the database connection file, and store the connection in the $conn variable
 
+// Start a session
 session_start();
-$empNo = $_SESSION['empNo'];
-$firstName = getFirstName($conn, $empNo);
-$lastName = getLastName($conn, $empNo);
-$accountType = getAccountType($conn, $empNo);
+$empNo = $_SESSION['empNo']; // Get the employee number from the session
+$firstName = getFirstName($conn, $empNo); // Get the first name of the employee from the database
+$lastName = getLastName($conn, $empNo); // Get the last name of the employee from the database
+$accountType = getAccountType($conn, $empNo); // Get the account type of the employee from the database
 ?>
 
-<!--Created by Kevin Titus on 2022-07-21.-->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -21,12 +20,12 @@ $accountType = getAccountType($conn, $empNo);
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>Source Tech Portal</title>
+    <title>Source Tech Portal</title> <!-- Change the title of the page here -->
     <!-- plugins:css -->
+    <!-- ALL THE STYLE SHEETS -->
     <link rel="stylesheet" href="../vendors/feather/feather.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css" />
-    <!-- endinject -->
     <!-- Plugin css for this page -->
     <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
@@ -38,30 +37,26 @@ $accountType = getAccountType($conn, $empNo);
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
-
-
     <link href="~bulma-calendar/dist/css/bulma-calendar.min.css" rel="stylesheet">
     <script src="~bulma-calendar/dist/js/bulma-calendar.min.js"></script>
 
     <!-- End plugin css for this page -->
-    <!-- inject:css -->
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css" />
     <!-- endinject -->
     <link rel="shortcut icon" href="../images/favicon.ico" />
 
-
     <script>
+        // When the page is loaded, hide the loader
         $(document).ready(function() {
             $('.js-example-basic-single').select2();
         });
     </script>
 
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDvUiP0DYjb3XiFw9toptx7gBtokfnyfFM&libraries=places"></script>
-
 
 </head>
 
 <style>
+    /* Loader */
     * {
         margin: 0;
         padding: 0;
@@ -80,10 +75,10 @@ $accountType = getAccountType($conn, $empNo);
         z-index: 99999;
     }
 
-    .disppear {
+    .disppear { /* After 1.5 seconds, the loader will disappear */
         animation: vanish 1.5s forwards;
     }
-
+    /* Loader animation */
     @keyframes vanish {
         100% {
             opacity: 0;
@@ -93,6 +88,7 @@ $accountType = getAccountType($conn, $empNo);
 </style>
 
 <body>
+    <!-- Loader -->
     <div class="loader">
         <img src="../images/loader.gif" alt="" />
     </div>
@@ -100,32 +96,31 @@ $accountType = getAccountType($conn, $empNo);
     <div class="container-scroller">
 
         <!-- partial:includes/_navbar.php -->
-        <?php include "../includes/_navbar.php"; ?>
+        <?php include "../includes/_navbar.php"; ?> <!-- Include the navbar file -->
 
         <div class="container-fluid page-body-wrapper">
 
             <!-- partial:includes/_adminsidebar.php -->
-            <?php include '../includes/_adminsidebar.php'; ?>
+            <?php include '../includes/_adminsidebar.php'; ?> <!-- Include the sidebar file -->
 
             <!-- partial -->
             <div class="main-panel">
 
                 <div class="content-wrapper">
                     <div class="row">
-                        <div class="col-md-12 grid-margin">
+                        <div class="col-md-12 grid-margin"> 
                             <div class="row">
                                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
-                                    <h3 class="font-weight-bold">Create a Team</h3>
+                                    <h3 class="font-weight-bold">Create a Team</h3> <!-- Title of the page -->
                                 </div>
                                 <div class="row"></div>
-                                <div class="col-lg-8 grid-margin stretch-card mx-auto">
+                                <div class="col-lg-8 grid-margin stretch-card mx-auto"> <!-- Center the card -->
                                     <div class="card">
                                         <div class="card-body">
 
-
                                             <div class="container-fluid">
 
-                                                <form action="../includes/signup.inc.php" method="POST">
+                                                <form action="../includes/signup.inc.php" method="POST"> <!-- All form inputs are submitted to the signup.inc.php file -->
                                                     <div class="row">
 
                                                         <div class="col-md-12">
@@ -134,14 +129,14 @@ $accountType = getAccountType($conn, $empNo);
                                                                     <label for="teamName">
                                                                         Team Name: <span style="color: red;">*</span>
                                                                     </label>
-                                                                    <input type="text" class="form-control" id="teamName" name="teamName" required />
+                                                                    <input type="text" class="form-control" id="teamName" name="teamName" required /> <!-- Team name input, which has a required attribute (Like a presence check) -->
                                                                 </div>
 
                                                                 <div class="form-group">
                                                                     <label for="teamType">Department <span style="color: red;">*</span></label>
-                                                                    <select class="select2" style="width: 100%; height: 38px;" id="department" name="department" required>
-                                                                        <option value="" disabled selected hidden>Please select</option>
-                                                                        <option value="SLS">Sales</option>
+                                                                    <select class="select2" style="width: 100%; height: 38px;" id="department" name="department" required> <!-- Department input, which has a required attribute (Like a presence check) -->
+                                                                        <option value="" disabled selected hidden>Please select</option> <!-- Default option -->
+                                                                        <option value="SLS">Sales</option> 
                                                                         <option value="MKT">Marketing</option>
                                                                         <option value="FNC">Finance</option>
                                                                         <option value="ENG">Engineering</option>
@@ -162,7 +157,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                         Team Description:
                                                                     </label>
                                                                     <div style="position: relative;">
-                                                                        <textarea class="form-control" id="teamDescription" name="teamDescription" maxlength="150" oninput="updateCounter(this)" style="padding-right: 30px;"></textarea>
+                                                                        <textarea class="form-control" id="teamDescription" name="teamDescription" maxlength="150" oninput="updateCounter(this)" style="padding-right: 30px;"></textarea> <!-- Team description input -->
                                                                         <span id="counter" style="position: absolute; bottom: 0; right: 10px; font-size: smaller;"></span>
                                                                     </div>
                                                                 </div>
@@ -171,7 +166,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                     <label for="teamLead">
                                                                         Team Manager/Lead: <span style="color: red;">*</span>
                                                                     </label>
-                                                                    <input type="text" class="form-control" id="teamLead" name="teamLead" placeholder="Search for a lead" list="teamList" required />
+                                                                    <input type="text" class="form-control" id="teamLead" name="teamLead" placeholder="Search for a lead" list="teamList" required /> <!-- Team lead input, which has a required attribute (Like a presence check) -->
                                                                     <input type="hidden" id="teamLeadID" name="teamLeadID">
 
                                                                     <datalist id="teamList">
@@ -181,8 +176,8 @@ $accountType = getAccountType($conn, $empNo);
                                                                         $result = mysqli_query($conn, $sql);
 
                                                                         // Loop through the query results and display them as options in the datalist
-                                                                        while ($row = mysqli_fetch_assoc($result)) {
-                                                                            echo "<option value='" . $row["fullName"] . "' data-value='" . $row["UserID"] . "'>";
+                                                                        while ($row = mysqli_fetch_assoc($result)) { // Loop through the query results
+                                                                            echo "<option value='" . $row["fullName"] . "' data-value='" . $row["UserID"] . "'>"; // Display the user's full name as the option value and their UserID as the data-value attribute
                                                                         }
 
                                                                         // Close the database connection
@@ -192,17 +187,19 @@ $accountType = getAccountType($conn, $empNo);
 
                                                                     <script>
                                                                         // Listen for changes on the datalist input
-                                                                        document.getElementById("teamLead").addEventListener("input", function() {
+                                                                        document.getElementById("teamLead").addEventListener("input", function() { // Listen for changes on the datalist input
                                                                             // Get the selected option and set the hidden input value to the corresponding data-value attribute
                                                                             var option = document.querySelector("#teamList option[value='" + this.value + "']");
                                                                             if (option) {
-                                                                                document.getElementById("teamLeadID").value = option.getAttribute("data-value");
+                                                                                document.getElementById("teamLeadID").value = option.getAttribute("data-value"); // Set the hidden input value to the corresponding data-value attribute
                                                                             }
                                                                         });
                                                                     </script>
                                                                 </div>
 
                                                                 <script>
+                                                                    // Update the counter
+                                                                    // Used for the description input
                                                                     function updateCounter(field) {
                                                                         var maxLength = 150;
                                                                         var currentLength = field.value.length;
@@ -211,7 +208,7 @@ $accountType = getAccountType($conn, $empNo);
                                                                     }
                                                                 </script>
 
-                                                                <!-- Error message -->
+                                                                <!-- Error messages -->
                                                                 <?php
                                                                 //Empty input
                                                                 if (isset($_GET['error']) && $_GET['error'] === "emptyinput") {
@@ -234,7 +231,7 @@ $accountType = getAccountType($conn, $empNo);
 
                                                                 <button type="submit" name="createTeam" class="form-control btn     btn-primary rounded submit px-3">
                                                                     <b>Create Team</b>
-                                                                </button>
+                                                                </button> <!-- Create team button -->
 
                                                         </div>
                                                     </div>
@@ -263,51 +260,29 @@ $accountType = getAccountType($conn, $empNo);
                 <script src="../js/dataTables.select.min.js"></script>
 
                 <!-- End plugin js for this page -->
-                <!-- inject:js -->
                 <script src="../js/off-canvas.js"></script>
                 <script src="../js/hoverable-collapse.js"></script>
                 <script src="../js/template.js"></script>
                 <script src="../js/settings.js"></script>
                 <script src="../js/todolist.js"></script>
-                <!-- endinject -->
                 <!-- Custom js for this page-->
                 <script src="../js/dashboard.js"></script>
                 <script src="../js/Chart.roundedBarCharts.js"></script>
                 <!-- End custom js for this page-->
 
                 <script>
-                    var loader = document.querySelector(".loader")
+                    // Loader script
+                    var loader = document.querySelector(".loader") // Get the loader element
 
-                    window.addEventListener("load", vanish);
+                    window.addEventListener("load", vanish); // Listen for the window to load
 
                     function vanish() {
-                        loader.classList.add("disppear");
+                        loader.classList.add("disppear"); // Add the disppear class to the loader element
                     }
-                </script>
-
-                <script>
-                    $(function() {
-                        var sixteenYearsAgo = new Date();
-                        var hundredYearsAgo = new Date();
-                        sixteenYearsAgo.setFullYear(sixteenYearsAgo.getFullYear() - 16);
-                        hundredYearsAgo.setFullYear(hundredYearsAgo.getFullYear() - 65);
-
-                        var maxDate = sixteenYearsAgo.toISOString().split('T')[0];
-                        var minDate = hundredYearsAgo.toISOString().split('T')[0];
-
-                        $('#DOB').attr('max', maxDate);
-                        $('#DOB').attr('min', minDate);
-                        $('#DOB').val(maxDate);
-                    });
                 </script>
 
             </div>
         </div>
     </div>
-
-
 </body>
-
-
-
 </html>
