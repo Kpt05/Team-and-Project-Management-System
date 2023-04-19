@@ -139,9 +139,18 @@ if (!$isAuthenticated) {
 
         <div class="container-fluid page-body-wrapper">
 
-            <!-- partial:includes/_adminsidebar.php -->
-            <?php include '../includes/_adminsidebar.php'; ?> <!-- Sidebar -->
-
+              <!-- partial - Account Type Based Navbar -->
+            <!-- This will use the sidebar partial based on the account type in the session variable of the user and include it on the dasboard.php page -->
+            <?php
+            if ($accountType == 'Employee') {
+                include '../includes/_employeesidebar.php';
+            } elseif ($accountType == 'Manager') {
+                include '../includes/_managersidebar.php';
+            } elseif ($accountType == 'Administrator') {
+                include '../includes/_adminsidebar.php';
+            }
+            ?>
+            
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">

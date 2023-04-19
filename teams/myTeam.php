@@ -1,16 +1,27 @@
 <!--Created by Kevin Titus on 2022-07-19.-->
 <!-- PHP intergration -->
 <?php
+// Start the session
+session_start();
 require_once('../includes/functions.inc.php'); // Include the functions file
 // Make a database connection
 $conn = require '../includes/dbconfig.php'; // Include the database connection file
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 
-// Start the session
-session_start();
+
 $empNo = $_SESSION['empNo']; // Get the employee number of the logged in user
 $firstName = getFirstName($conn, $empNo); // Get the first name of the logged in user
 $lastName = getLastName($conn, $empNo); // Get the last name of the logged in user
 $accountType = getAccountType($conn, $empNo); // Get the account type of the logged in user
+
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
 
 //If the delete button is clicked, the team is deleted from the Teams table
 if (isset($_POST['deleteTeam'])) {
@@ -198,8 +209,17 @@ $result = mysqli_query($conn, $sql);
 
         <div class="container-fluid page-body-wrapper">
 
-            <!-- partial:includes/_adminsidebar.php -->
-            <?php include '../includes/_adminsidebar.php'; ?> <!-- The partial includes the sidebar on this page -->
+             <!-- partial - Account Type Based Navbar -->
+            <!-- This will use the sidebar partial based on the account type in the session variable of the user and include it on the dasboard.php page -->
+            <?php
+            if ($accountType == 'Employee') {
+                include '../includes/_employeesidebar.php';
+            } elseif ($accountType == 'Manager') {
+                include '../includes/_managersidebar.php';
+            } elseif ($accountType == 'Administrator') {
+                include '../includes/_adminsidebar.php';
+            }
+            ?>
 
             <!-- partial -->
             <div class="main-panel">

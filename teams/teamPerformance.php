@@ -2,15 +2,25 @@
 PHP intergration
 -->
 <?php
+session_start();
 require_once('../includes/functions.inc.php');
 // Make a database connection
 $conn = require '../includes/dbconfig.php';
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 
-session_start();
 $empNo = $_SESSION['empNo'];
 $firstName = getFirstName($conn, $empNo);
 $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
+
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
 ?>
 
 <!--Created by Kevin Titus on 2022-07-21.-->
@@ -104,10 +114,17 @@ $accountType = getAccountType($conn, $empNo);
 
         <div class="container-fluid page-body-wrapper">
 
-    
-
-            <!-- partial:includes/_adminsidebar.php -->
-            <?php include '../includes/_adminsidebar.php'; ?>
+      <!-- partial - Account Type Based Navbar -->
+            <!-- This will use the sidebar partial based on the account type in the session variable of the user and include it on the dasboard.php page -->
+            <?php
+            if ($accountType == 'Employee') {
+                include '../includes/_employeesidebar.php';
+            } elseif ($accountType == 'Manager') {
+                include '../includes/_managersidebar.php';
+            } elseif ($accountType == 'Administrator') {
+                include '../includes/_adminsidebar.php';
+            }
+            ?>
 
             <!-- partial -->
             <div class="main-panel">

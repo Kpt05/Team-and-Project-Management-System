@@ -195,8 +195,17 @@ if ($row) {
 
         <div class="container-fluid page-body-wrapper">
 
-            <!-- partial:includes/_adminsidebar.php -->
-            <?php include '../includes/_adminsidebar.php'; ?> <!-- Sidebar -->
+            <!-- partial - Account Type Based Navbar -->
+            <!-- This will use the sidebar partial based on the account type in the session variable of the user and include it on the dasboard.php page -->
+            <?php
+            if ($accountType == 'Employee') {
+                include '../includes/_employeesidebar.php';
+            } elseif ($accountType == 'Manager') {
+                include '../includes/_managersidebar.php';
+            } elseif ($accountType == 'Administrator') {
+                include '../includes/_adminsidebar.php';
+            }
+            ?>
 
             <!-- partial -->
             <div class="main-panel">
@@ -234,10 +243,10 @@ if ($row) {
                     const userID = <?php echo $userID; ?>; // The user ID is passed to JavaScript via PHP
 
                     function loadButtonsAndStatus() { // This function loads the buttons and status
-                        console.log('Loading buttons and status for user ID:', userID); 
+                        console.log('Loading buttons and status for user ID:', userID);
                         // The AJAX request is sent to the get_clocking_buttons.php file
                         $.ajax({
-                            url: 'get_clocking_buttons.php',  // The get_clocking_buttons.php file is called
+                            url: 'get_clocking_buttons.php', // The get_clocking_buttons.php file is called
                             method: 'POST', // The method is POST which is used to send data to the server
                             dataType: 'json', // The data type is JSON which is used to send data to the server
                             data: {

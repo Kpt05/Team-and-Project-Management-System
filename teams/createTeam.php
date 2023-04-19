@@ -1,16 +1,26 @@
 <!--Created by Kevin Titus on 2022-07-21.-->
 <!-- PHP intergration -->
 <?php
+// Start a session
+session_start();
 require_once('../includes/functions.inc.php'); // Include the functions file, which contains the functions used in this file
 // Make a database connection
 $conn = require '../includes/dbconfig.php'; // Include the database connection file, and store the connection in the $conn variable
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 
-// Start a session
-session_start();
 $empNo = $_SESSION['empNo']; // Get the employee number from the session
 $firstName = getFirstName($conn, $empNo); // Get the first name of the employee from the database
 $lastName = getLastName($conn, $empNo); // Get the last name of the employee from the database
 $accountType = getAccountType($conn, $empNo); // Get the account type of the employee from the database
+
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -100,8 +110,17 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the emp
 
         <div class="container-fluid page-body-wrapper">
 
-            <!-- partial:includes/_adminsidebar.php -->
-            <?php include '../includes/_adminsidebar.php'; ?> <!-- Include the sidebar file -->
+              <!-- partial - Account Type Based Navbar -->
+            <!-- This will use the sidebar partial based on the account type in the session variable of the user and include it on the dasboard.php page -->
+            <?php
+            if ($accountType == 'Employee') {
+                include '../includes/_employeesidebar.php';
+            } elseif ($accountType == 'Manager') {
+                include '../includes/_managersidebar.php';
+            } elseif ($accountType == 'Administrator') {
+                include '../includes/_adminsidebar.php';
+            }
+            ?>
 
             <!-- partial -->
             <div class="main-panel">
