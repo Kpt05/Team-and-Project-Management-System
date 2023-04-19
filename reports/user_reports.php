@@ -50,7 +50,7 @@ while ($row = mysqli_fetch_assoc($result)) { // Fetch a result row as an associa
     $efficiencyRatio = ($tasksAssigned / $hoursWorked); // Calculate efficiency ratio
 
     // Calculate overall performance score
-    $performanceScore = ($completionRate + $productivityIndex + $efficiencyRatio) / 3; 
+    $performanceScore = ($completionRate + $productivityIndex + $efficiencyRatio) / 3;
 
     // Store performance data in arrays
     $teamPerformance[$teamID][$userID] = $performanceScore; // The teamPerformance array holds the team ID as the key and an array of user IDs and performance scores as the value
@@ -135,8 +135,17 @@ while ($row = mysqli_fetch_assoc($result)) { // Fetch a result row as an associa
 
             <div class="container-fluid page-body-wrapper">
 
-                <!-- partial:includes/_adminsidebar.php -->
-                <?php include '../includes/_adminsidebar.php'; ?> <!-- Sidebar -->
+                <!-- partial - Account Type Based Navbar -->
+                <!-- This will use the sidebar partial based on the account type in the session variable of the user and include it on the dasboard.php page -->
+                <?php
+                if ($accountType == 'Employee') {
+                    include '../includes/_employeesidebar.php';
+                } elseif ($accountType == 'Manager') {
+                    include '../includes/_managersidebar.php';
+                } elseif ($accountType == 'Administrator') {
+                    include '../includes/_adminsidebar.php';
+                }
+                ?>
 
                 <!-- partial -->
                 <div class="main-panel">
@@ -442,7 +451,7 @@ while ($row = mysqli_fetch_assoc($result)) { // Fetch a result row as an associa
                                                     echo '<th>Tasks Completed</th>'; // Update with desired table class
                                                     echo '<th>Productivity Index</th>'; // Add a new column for Productivity Index
                                                     echo '</tr>'; // Update with desired table class
-                                                    echo '</thead>';// Update with desired table class
+                                                    echo '</thead>'; // Update with desired table class
                                                     echo '<tbody>'; // Update with desired table class
 
                                                     foreach ($users as $userID => $userData) {
@@ -501,7 +510,7 @@ while ($row = mysqli_fetch_assoc($result)) { // Fetch a result row as an associa
             <!-- Custom js for this page-->
             <script src="../js/chart.js"></script>
             <!-- End custom js for this page-->
-            
+
             <script>
                 // Loader script
                 var loader = document.querySelector(".loader")
@@ -513,4 +522,5 @@ while ($row = mysqli_fetch_assoc($result)) { // Fetch a result row as an associa
                 }
             </script>
 </body>
+
 </html>

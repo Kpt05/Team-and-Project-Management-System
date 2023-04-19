@@ -8,11 +8,11 @@ require_once('../includes/functions.inc.php'); // Include the functions file
 $conn = require '../includes/dbconfig.php'; // Include the database connection file
 require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 
-
 $empNo = $_SESSION['empNo']; // Get the employee number of the logged in user
 $firstName = getFirstName($conn, $empNo); // Get the first name of the logged in user
 $lastName = getLastName($conn, $empNo); // Get the last name of the logged in user
 $accountType = getAccountType($conn, $empNo); // Get the account type of the logged in user
+$userID = getUserID($conn, $empNo); // Get the UserID of the logged in user
 
 // Authenticate the user
 $isAuthenticated = authenticate($conn);
@@ -36,7 +36,7 @@ $sql = "SELECT * FROM Users";
 // Execute the query and get the result set
 $result = mysqli_query($conn, $sql);
 
-$sql = "SELECT * FROM Teams";
+$sql = "SELECT Teams.* FROM Teams INNER JOIN Users ON Teams.teamID = Users.teams WHERE Users.UserID = '$userID'";
 $result = mysqli_query($conn, $sql);
 
 ?>
@@ -48,7 +48,7 @@ $result = mysqli_query($conn, $sql);
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>View Teams | Source Tech Portal</title> <!-- Page title -->
+    <title>My Team | Source Tech Portal</title> <!-- Page title -->
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
@@ -121,7 +121,8 @@ $result = mysqli_query($conn, $sql);
         overflow: hidden;
     }
 
-    .team-card:hover { /* When the user hovers over the card, the shadow is increased */
+    .team-card:hover {
+        /* When the user hovers over the card, the shadow is increased */
         box-shadow: 0 0 5px #ddd;
     }
 
@@ -138,6 +139,7 @@ $result = mysqli_query($conn, $sql);
         border: 5px solid white;
         box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
     }
+
     /* The team name */
     .team-card .team-name {
         font-size: 24px;
@@ -150,6 +152,7 @@ $result = mysqli_query($conn, $sql);
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
     /* The team info */
     .team-card .team-info {
         font-size: 14px;
@@ -160,6 +163,7 @@ $result = mysqli_query($conn, $sql);
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
     /* The team info */
     .create-team-card {
         border: 1px dashed #ddd;
@@ -190,6 +194,7 @@ $result = mysqli_query($conn, $sql);
         left: 50%;
         transform: translate(-50%, -50%);
     }
+
     /* When the team card is selected, the card border is to change */
     .team-card.selected {
         border: 2px solid #375577;
@@ -209,7 +214,7 @@ $result = mysqli_query($conn, $sql);
 
         <div class="container-fluid page-body-wrapper">
 
-             <!-- partial - Account Type Based Navbar -->
+            <!-- partial - Account Type Based Navbar -->
             <!-- This will use the sidebar partial based on the account type in the session variable of the user and include it on the dasboard.php page -->
             <?php
             if ($accountType == 'Employee') {
@@ -226,22 +231,29 @@ $result = mysqli_query($conn, $sql);
                 <div class="content-wrapper">
                     <div class="row">
                         <div class="col-md-8">
-                            <h2 class="font-weight-bold">View Teams</h2>
+                            <h2 class="font-weight-bold">My Team</h2>
                         </div>
-                        <div class="col-md-4 text-md-right"> <!-- This is the button to add a new team -->
-                            <a href="createTeam.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
-                                <i class="bi bi-plus" style="font-size: 1.5rem; color: #375577;"></i>
-                            </a>
-                            <a href="teamPerformance.php" class="btn btn-link text-decoration-none text-reset" id="team-performance"> <!-- This is the button to view team performance -->
-                                <i class="bi bi-award" style="font-size: 1.5rem; color: #375577;"></i>
-                            </a>
-                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-user" style="opacity: 0.5; pointer-events: none;"> <!-- This is the button to edit a team -->
-                                <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
-                            </button>
-                            <button type="button" class="btn btn-link text-decoration-none text-reset" id="delete-user" style="opacity: 0.5; pointer-events: none;"> <!-- This is the button to delete a team -->
-                                <i class="bi bi-trash3" style="font-size: 1.5rem; color: #375577;"></i>
-                            </button>
-                        </div>
+                        <?php
+                        // Display the buttons only if the user is an admin or a manager
+                        if ($accountType == 'Manager' || $accountType == 'Administrator') {
+                        ?>
+                            <div class="col-md-4 text-md-right">
+                                <a href="createTeam.php" class="btn btn-link text-decoration-none text-reset" id="add-user">
+                                    <i class="bi bi-plus" style="font-size: 1.5rem; color: #375577;"></i>
+                                </a>
+                                <a href="teamPerformance.php" class="btn btn-link text-decoration-none text-reset" id="team-performance">
+                                    <i class="bi bi-award" style="font-size: 1.5rem; color: #375577;"></i>
+                                </a>
+                                <button type="button" class="btn btn-link text-decoration-none text-reset" id="edit-user" style="opacity: 0.5; pointer-events: none;">
+                                    <i class="bi bi-pencil-square" style="font-size: 1.5rem; color: #375577;"></i>
+                                </button>
+                                <button type="button" class="btn btn-link text-decoration-none text-reset" id="delete-user" style="opacity: 0.5; pointer-events: none;">
+                                    <i class="bi bi-trash3" style="font-size: 1.5rem; color: #375577;"></i>
+                                </button>
+                            </div>
+                        <?php
+                        }
+                        ?>
                     </div>
 
 
@@ -324,9 +336,17 @@ $result = mysqli_query($conn, $sql);
                                     }
                                     ?>
 
-                                    <div class="create-team-card" onclick="location.href='createTeam.php';"> <!-- This is the card to create a new team -->
-                                        <div class="create-team-icon">+</div>
-                                    </div>
+                                    <?php
+                                    // Display the create team card only if the user is an admin or a manager
+                                    if ($accountType == 'Manager' || $accountType == 'Administrator') {
+                                    ?>
+                                        <div class="create-team-card" onclick="location.href='createTeam.php';"> <!-- This is the card to create a new team -->
+                                            <div class="create-team-icon">+</div>
+                                        </div>
+                                    <?php
+                                    }
+                                    ?>
+
                                 </div>
                             </div>
                         </div>
@@ -471,7 +491,6 @@ $result = mysqli_query($conn, $sql);
             }
         });
     });
-    
 </script>
 
 </html>
