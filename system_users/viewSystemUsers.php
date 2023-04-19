@@ -1,27 +1,37 @@
 <!--Created by Kevin Titus on 2022-07-19.-->
 <!-- PHP intergration -->
 <?php
+// Start the session and get the employee number from the session variable which was set in the login page, but is used to get the first name, last name and account type from the database
+session_start();
+
 require_once('../includes/functions.inc.php'); // Include the functions file
 // Make a database connection
-$conn = require '../includes/dbconfig.php'; // Include the database connection file which returns the connection variable
+$conn = require '../includes/dbconfig.php'; // Include the database connection file which returns the connection variable 
 
-// Start the session
-session_start();
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 $empNo = $_SESSION['empNo']; // Get the employee number from the session
 $firstName = getFirstName($conn, $empNo); // Get the first name from the database
 $lastName = getLastName($conn, $empNo); // Get the last name from the database
 $accountType = getAccountType($conn, $empNo); // Get the account type from the database
 
-// If the delete button is triggered, a query is executed to delete the user from the database
+// Authenticate the user first
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
+
+// If the delete button is triggered, a query is executed to delete the user from the database using the employee number of the selected user
 if (isset($_POST['delete'])) {
     $empNo = $_POST['empNo'];
     $sql = "DELETE FROM Users WHERE empNo='$empNo'";
     mysqli_query($conn, $sql);
 }
 
-// Define the SQL query to retrieve data from the Users Table
+// Define the SQL query to retrieve data from the Users Table. This query is used to populate the table with the users
 $sql = "SELECT * FROM Users";
-
 // Execute the query and get the result set
 $result = mysqli_query($conn, $sql);
 ?>
@@ -35,23 +45,23 @@ $result = mysqli_query($conn, $sql);
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>View System Users | Source Tech Portal</title> <!-- Title of the page -->
     <!-- plugins:css -->
-    <link rel="stylesheet" href="../vendors/feather/feather.css" />
-    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
-    <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../vendors/feather/feather.css" /> <!-- Feather Icons -->
+    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" /> <!-- Themify Icons -->
+    <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css" /> <!-- Base CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css"> <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"> <!-- Bootstrap Icons -->
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css" integrity="sha512-vn+VrRGJkbPZdVgbNVl0GDM98/r50LZxJxh7qPy9XrHr7FzRgNlV0kjfOZowWV7fqbGmzTcTmF9bPYfbtBvM+w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js" integrity="sha512-BiMDI4PnLMT6U5SjjU5vQF5I6Rh3qBpfW8VDvL0swroCmzBtvHfZC8SKv6EGIzoIDc1NEiKbJKYqXlNmc5i6UQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
-    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
-    <link rel="stylesheet" type="text/css" href="../js/select.dataTables.min.css" />
+    <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css" /> <!-- Data Table CSS -->
+    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" /> <!-- Themify Icons -->
+    <link rel="stylesheet" type="text/css" href="../js/select.dataTables.min.css" /> <!-- Data Table CSS -->
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="../css/vertical-layout-light/style.css" />
-    <link rel="shortcut icon" href="../images/favicon.ico" />
+    <link rel="stylesheet" href="../css/vertical-layout-light/style.css" /> <!-- CSS for the page -->
+    <link rel="shortcut icon" href="../images/favicon.ico" /> <!-- Favicon -->
 
     <!-- Google Fonts
 		============================================ -->
@@ -148,7 +158,7 @@ $result = mysqli_query($conn, $sql);
                                         <!-- Data table which displays all users -->
                                         <table id="data-table-basic" class="table table-hover">
                                             <thead>
-                                                <!-- Table headings -->
+                                                <!-- Table headings for the datatable -->
                                                 <tr>
                                                     <th>Employee No.</th>
                                                     <th>Name</th>
@@ -164,6 +174,7 @@ $result = mysqli_query($conn, $sql);
                                             </thead>
                                             <tbody>
                                                 <?php
+                                                // The loop goes through the entire Users table and outputs the data to the table
                                                 // Loop through each row in the result set and output the data to the table
                                                 while ($row = mysqli_fetch_assoc($result)) { // Fetches a result row as an associative array
                                                     echo "<tr onclick=\"highlightRow(this)\">";

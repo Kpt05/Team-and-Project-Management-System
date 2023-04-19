@@ -1,8 +1,9 @@
 <!-- partial:/_navbar.php
 <?php
-// Start the session
+// Start the session if it hasn't already been started, using the session variable from each page, the Name of the user is displayed in the navbar
 session_start();
-if (isset($_POST['logout'])) {
+
+if (isset($_POST['logout'])) { // If the user clicks the logout button on the navbar then the session is destroyed and the user is redirected to the login page
     // Unset all of the session variables
     $_SESSION = array();
     // Destroy the session
@@ -29,8 +30,8 @@ if (isset($_POST['logout'])) {
             <li class="nav-item nav-profile dropdown">
                 <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-toggle="dropdown" id="profileDropdown">
                     <div class="profile-text pr-3" style="line-height: 1.2em;">
-                        <p class="mb-0" style="margin-bottom: 0;"><?php echo $firstName . " " . $lastName; ?></p>
-                        <small class="text-white" style="line-height: 1.2em;"><?php echo $accountType; ?></small>
+                        <p class="mb-0" style="margin-bottom: 0;"><?php echo $firstName . " " . $lastName; ?></p> <!-- Here the Name of the user is displayed using the session variable -->
+                        <small class="text-white" style="line-height: 1.2em;"><?php echo $accountType; ?></small> <!-- Here the account type of the user is displayed using the session variable -->
                     </div>
                     <img src="../images/faces/face28.jpg" alt="profile" />
                 </a>
@@ -45,7 +46,7 @@ if (isset($_POST['logout'])) {
 
             <!-- JavaScript code to handle logout button click -->
             <script>
-                function logout() {
+                function logout() { // When the logout button is clicked the session is destroyed and the user is redirected to the login page
                     // Send an AJAX request to the server to destroy the session
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', '<?php echo $_SERVER["PHP_SELF"]; ?>');
@@ -53,8 +54,8 @@ if (isset($_POST['logout'])) {
                     xhr.send('logout=true');
                     // Redirect the user to the login page
                     var currentUrl = window.location.href;
-                    var rootUrl = currentUrl.replace(/\/.*$/i, '/index.php');
-                    window.location.href = rootUrl;
+                    var rootUrl = currentUrl.replace(/\/.*$/i, '/index.php'); // Replace everything after the last slash with index.php
+                    window.location.href = rootUrl; // Redirect the user to the login page
                 }
             </script>
         </ul>

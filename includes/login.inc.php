@@ -13,13 +13,16 @@ if (isset($_POST["submit"])) {
 
     // Function call to check for empty fields
     if (emptyInputLogin($email, $password) !== false) {
-        header("Location: ../index.php?error=emptyinput");
+        echo "Error: Empty input<br>";
         exit();
     }
 
     // Function call to login user
-    if (login($conn, $email, $password)) {
+    $login_result = login($conn, $email, $password);
+    if ($login_result === true) {
         header("Location: ../Dashboard.php");
         exit();
+    } else {
+        echo "Error: " . $login_result . "<br>";
     }
 }

@@ -1,5 +1,10 @@
 <?php
 // Path: includes\signup.inc.php
+// Add error reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+print_r($_POST);
 
 require('functions.inc.php'); // Includes the functions.inc.php file
 $conn = require __DIR__ . '/dbconfig.php'; // Includes the dbconfig.php file to connect to the database

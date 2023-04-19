@@ -1,15 +1,29 @@
 <!-- PHP intergration -->
 <?php
+// Start session
+session_start();
 // Including functions.inc.php to use functions and dbconfig.php to connect to the database
 require_once('../includes/functions.inc.php');
 $conn = require '../includes/dbconfig.php';
 
-// Start session
-session_start();
+
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 $empNo = $_SESSION['empNo'];
 $firstName = getFirstName($conn, $empNo);
 $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
+$userID = getUserID($conn, $empNo); // Get user ID
+$reportsData = getReportsData($conn, $userID); // Get data from Reports table
+
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -83,7 +97,7 @@ $accountType = getAccountType($conn, $empNo);
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
-                <div class="row">
+                    <div class="row">
                         <div class="col-md-12 grid-margin">
                             <div class="row">
                                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
@@ -102,21 +116,151 @@ $accountType = getAccountType($conn, $empNo);
                         <div class="col-lg-6 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title">Line chart</h4>
-                                    <canvas id="lineChart"></canvas>
+                                    <h4 class="card-title">Tasks Completed</h4>
+                                    <canvas id="tasksCompletedChart"></canvas>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6 grid-margin stretch-card">
                             <div class="card">
                                 <div class="card-body">
-                                    <h4 class="card-title">Bar chart</h4>
-                                    <canvas id="barChart"></canvas>
+                                    <h4 class="card-title">Hours Worked</h4>
+                                    <canvas id="hoursWorkedChart"></canvas>
                                 </div>
                             </div>
                         </div>
+                        <div class="col-lg-6 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Completion Rate</h4>
+                                    <canvas id="completionRateChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 grid-margin stretch-card">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Average Tasks Completed per Hour Worked</h4>
+                                    <canvas id="tasksPerHourChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Plugin js for this page -->
+                        <script src="../vendors/chart.js/Chart.min.js"></script>
+                        <script>
+                            // Convert PHP data to JavaScript
+                            const reportsData = <?php echo json_encode($reportsData); ?>;
+
+                            // Get canvas elements
+                            const tasksCompletedChart = document.getElementById('tasksCompletedChart').getContext('2d');
+                            const hoursWorkedChart = document.getElementById('hoursWorkedChart').getContext('2d');
+
+                            // Generate charts using Chart.js
+                            new Chart(tasksCompletedChart, {
+                                type: 'bar',
+                                data: {
+                                    labels: reportsData.map(report => report.reportID),
+                                    datasets: [{
+                                        label: 'Tasks Completed',
+                                        data: reportsData.map(report => report.tasksCompleted),
+                                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+
+                            new Chart(hoursWorkedChart, {
+                                type: 'line',
+                                data: {
+                                    labels: reportsData.map(report => report.reportID),
+                                    datasets: [{
+                                        label: 'Hours Worked',
+                                        data: reportsData.map(report => report.hoursWorked),
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 2,
+                                        fill: false
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+                            // Get the new canvas elements
+                            const completionRateChart = document.getElementById('completionRateChart').getContext('2d');
+                            const tasksPerHourChart = document.getElementById('tasksPerHourChart').getContext('2d');
+
+                            // Calculate completion rates and average tasks per hour worked
+                            const completionRates = reportsData.map(report => report.tasksCompleted / report.tasksAssigned * 100);
+                            const tasksPerHour = reportsData.map(report => report.tasksCompleted / report.hoursWorked);
+
+                            // Generate the completion rate chart
+                            new Chart(completionRateChart, {
+                                type: 'line',
+                                data: {
+                                    labels: reportsData.map(report => report.reportID),
+                                    datasets: [{
+                                        label: 'Completion Rate (%)',
+                                        data: completionRates,
+                                        borderColor: 'rgba(75, 192, 192, 1)',
+                                        borderWidth: 2,
+                                        fill: false
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            max: 100
+                                        }
+                                    }
+                                }
+                            });
+
+                            // Generate the average tasks completed per hour worked chart
+                            new Chart(tasksPerHourChart, {
+                                type: 'bar',
+                                data: {
+                                    labels: reportsData.map(report => report.reportID),
+                                    datasets: [{
+                                        label: 'Tasks per Hour',
+                                        data: tasksPerHour,
+                                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                        borderColor: 'rgba(255, 99, 132, 1)',
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true
+                                        }
+                                    }
+                                }
+                            });
+                        </script>
+                        <!-- End plugin js for this page -->
+
+
+
+
+
+
                     </div>
-                    
+
                 </div>
                 <!-- content-wrapper ends -->
 

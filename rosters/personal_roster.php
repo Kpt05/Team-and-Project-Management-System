@@ -1,16 +1,25 @@
 <!--Created by Kevin Titus on 2022-07-21.-->
 <!-- PHP intergration -->
 <?php
+// Start the session
+session_start();
 require_once('../includes/functions.inc.php'); // Include the functions file
 $conn = require '../includes/dbconfig.php'; // Include the database connection file and return the connection object
 
-// Start the session
-session_start();
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 $empNo = $_SESSION['empNo']; // Get the employee number from the session
 $firstName = getFirstName($conn, $empNo); // Get the first name from the database
 $lastName = getLastName($conn, $empNo); // Get the last name from the database
 $accountType = getAccountType($conn, $empNo); // Get the account type from the database
 
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>

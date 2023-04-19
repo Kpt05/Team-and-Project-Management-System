@@ -1,17 +1,28 @@
 <!--Created by Kevin Titus on 2022-07-21.-->
 <!-- PHP intergration -->
 <?php
-
-require_once('../includes/functions.inc.php'); // Include the functions.inc.php file
+// Start a session to get the employee number from the session and use it to get the first name, last name and account type of the user
+session_start();
+require_once('../includes/functions.inc.php'); // Include the functions.inc.php file which contains the functions used in this file
 // Make a database connection
 $conn = require '../includes/dbconfig.php'; // Include the dbconfig.php file which contains the database connection details
 
-// Start a session
-session_start();
-$empNo = $_SESSION['empNo']; // Get the employee number from the session
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
+// This is then used to display the correct name and account type in the navbar and also to check if the user is an admin or manager to display this page
+$empNo = $_SESSION['empNo']; // Get the employee number from the session and store it in a variable called $empNo, this is used to get the first name, last name and account type of the user
 $firstName = getFirstName($conn, $empNo); // Get the first name of the user
 $lastName = getLastName($conn, $empNo); // Get the last name of the user
 $accountType = getAccountType($conn, $empNo); // Get the account type of the user
+
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -20,27 +31,23 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /> <!-- This meta tag is used to make the page responsive and scale to the device width -->
     <title>Source Tech Portal</title> <!-- Title of the page -->
     <!-- plugins:css -->
-    <link rel="stylesheet" href="../vendors/feather/feather.css" />
-    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
-    <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css" />
+    <link rel="stylesheet" href="../vendors/feather/feather.css" /> <!-- Feather icons for the navbar -->
+    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" /> <!-- Themify icons for the navbar -->
+    <link rel="stylesheet" href="../vendors/css/vendor.bundle.base.css" /> <!-- Base css for the page -->
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
-    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
-    <link rel="stylesheet" type="text/css" href="../js/select.dataTables.min.css" />
+    <link rel="stylesheet" href="../vendors/datatables.net-bs4/dataTables.bootstrap4.css" /> <!-- Data tables css -->
+    <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" /> <!-- Themify icons for the navbar -->
+    <link rel="stylesheet" type="text/css" href="../js/select.dataTables.min.css" /> <!-- Data tables css -->
 
-    <link rel="stylesheet" href="css/select2/select2.min.css">
-    <link rel="stylesheet" href="css/select2/">
+    <link rel="stylesheet" href="css/select2/select2.min.css"> <!-- Select2 css -->
+    <link rel="stylesheet" href="css/select2/"> <!-- Select2 css -->
 
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
-
-
-    <link href="~bulma-calendar/dist/css/bulma-calendar.min.css" rel="stylesheet">
-    <script src="~bulma-calendar/dist/js/bulma-calendar.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/css/select2.min.css" rel="stylesheet" /> <!-- Select2 css -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-beta.1/dist/js/select2.min.js"></script> <!-- Select2 js -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css"> <!-- Bootstrap icons css -->
 
     <!-- End plugin css for this page -->
     <link rel="stylesheet" href="../css/vertical-layout-light/style.css" />
@@ -145,7 +152,7 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
                                                                     <label for="projectName">
                                                                         Project name: <span style="color: red;">*</span>
                                                                     </label>
-                                                                    <input type="text" class="form-control" id="projectName" name="projectName" required /> <!-- Project name input, also set to required -->
+                                                                    <input type="text" class="form-control" id="projectName" name="projectName" maxlength="25" required /> <!-- Project name input, also set to required -->
                                                                 </div>
 
                                                                 <div class="form-group">
@@ -162,7 +169,7 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
                                                                     <div class="row">
                                                                         <div class="col-sm-6">
                                                                             <label for="priorityLevel">Priority Level:</label>
-                                                                            <select class="form-control" id="priorityLevel" name="priorityLevel">
+                                                                            <select class="form-control" id="priorityLevel" name="priorityLevel" required>
                                                                                 <option value="high">High</option>
                                                                                 <option value="medium">Medium</option>
                                                                                 <option value="low">Low</option>
@@ -170,7 +177,7 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
                                                                         </div>
                                                                         <div class="col-sm-6">
                                                                             <label for="projectStatus">Project Status:</label>
-                                                                            <select class="form-control" id="projectStatus" name="projectStatus">
+                                                                            <select class="form-control" id="projectStatus" name="projectStatus" required>
                                                                                 <option value="in-progress">In Progress</option>
                                                                                 <option value="pending">Pending</option>
                                                                                 <option value="completed">Completed</option>
@@ -180,12 +187,14 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
                                                                 </div>
 
 
+
                                                                 <div class="form-group">
                                                                     <label for="projectTeamID">Team ID: <span style="color: red;">*</span></label>
                                                                     <input type="text" class="form-control" id="projectTeamID" name="projectTeamID" placeholder="Search for a team ID" list="teamList1" required>
 
                                                                     <datalist id="teamList1">
                                                                         <?php
+                                                                        // This basically gets all the teamIDs from the database and displays them as options in the datalist, from there the user can select a teamID from the list
                                                                         // Query the teams table to get all teamIDs
                                                                         $sql = "SELECT teamID FROM Teams"; // SQL query to get all teamIDs
                                                                         $result = mysqli_query($conn, $sql); // Run the query
@@ -199,6 +208,9 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
 
                                                                     <script>
                                                                         // Listen for changes on the datalist input
+                                                                        // Get the selected option and set the hidden input value to the corresponding data-value attribute
+                                                                        // If the user types in a teamID that is not in the list, then the hidden input will be set to an empty string
+
                                                                         document.getElementById("teamID").addEventListener("input", function() { // Listen for changes on the datalist input
                                                                             // Get the selected option and set the hidden input value to the corresponding data-value attribute
                                                                             var option = document.querySelector("#teamList1 option[value='" + this.value + "']"); // Get the selected option
@@ -216,6 +228,7 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
 
                                                                     <datalist id="projectLeadList">
                                                                         <?php
+                                                                        // This basically gets all the users with accountType "Manager" from the database and displays them as options in the datalist, from there the user can select a user from the list
                                                                         // Query the users table to get all users with accountType "Manager"
                                                                         $sql = "SELECT UserID, CONCAT(firstName, ' ', lastName) AS fullName FROM Users WHERE accountType = 'Manager'"; // SQL query to get all users with accountType "Manager"
                                                                         $result = mysqli_query($conn, $sql);
@@ -228,6 +241,7 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
                                                                     </datalist>
 
                                                                     <script>
+                                                                        // This basically gets all the users with accountType "Manager" from the database and displays them as options in the datalist, from there the user can select a user from the list
                                                                         // Listen for changes on the datalist input
                                                                         document.getElementById("projectLead").addEventListener("input", function() {
                                                                             // Get the selected option and set the value of the input field and hidden input to the corresponding data-value attribute
@@ -242,6 +256,7 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
                                                                 </div>
 
                                                                 <script>
+
                                                                     // Function to count the characters in the project description input
                                                                     function updateCounter(field) {
                                                                         var maxLength = 150;
@@ -330,4 +345,5 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the use
                 </script>
 
 </body>
+
 </html>

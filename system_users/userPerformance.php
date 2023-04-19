@@ -1,16 +1,28 @@
 <!--Created by Kevin Titus on 2022-07-19.-->
 <!-- PHP intergration -->
 <?php
+// Start the session
+session_start();
+
 require_once('../includes/functions.inc.php'); // Include the functions file
 // Make a database connection
 $conn = require '../includes/dbconfig.php';
 
-// Start the session
-session_start();
+
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 $empNo = $_SESSION['empNo']; // Get the employee number of the logged in user
 $firstName = getFirstName($conn, $empNo); // Get the first name of the logged in user
 $lastName = getLastName($conn, $empNo); // Get the last name of the logged in user
 $accountType = getAccountType($conn, $empNo); // Get the account type of the logged in user
+
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -150,23 +162,35 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the log
 
                                             <div class="form-group">
                                                 <label for="tasksAssigned">Tasks Assigned:</label> <!-- Tasks assigned label -->
-                                                <input type="text" class="form-control" id="tasksAssigned" name="tasksAssigned" required inputmode="numeric" pattern="[0-9]*">
+                                                <input type="text" class="form-control" id="tasksAssigned" name="tasksAssigned" required inputmode="numeric" pattern="^([0-9]|[1-9][0-9]|99)$">
                                             </div>
-                                            
+
                                             <div class="form-group">
                                                 <label for="tasksCompleted">Tasks Completed:</label> <!-- Tasks completed label -->
-                                                <input type="text" class="form-control" id="tasksCompleted" name="tasksCompleted" required inputmode="numeric" pattern="[0-9]*">
+                                                <input type="text" class="form-control" id="tasksCompleted" name="tasksCompleted" required inputmode="numeric" pattern="^([0-9]|[1-9][0-9]|99)$">
                                             </div>
 
-                                        
                                             <div class="form-group">
                                                 <label for="hoursWorked">Hours Worked:</label> <!-- Hours worked label -->
-                                                <input type="number" class="form-control" id="hoursWorked" name="hoursWorked" required>
+                                                <input type="number" class="form-control" id="hoursWorked" name="hoursWorked" required max="299">
                                             </div>
 
-                                            <button type="submit" name="userPerformance" class="btn btn-primary">Submit</button> <!-- Submit button -->
-                                        </form>
 
+                                            <button type="submit" name="userPerformance" class="btn btn-primary">Submit</button> <!-- Submit button -->
+
+                                            <script>
+                                                document.querySelector('form').addEventListener('submit', function(event) {
+                                                    const tasksAssigned = parseInt(document.getElementById('tasksAssigned').value);
+                                                    const tasksCompleted = parseInt(document.getElementById('tasksCompleted').value);
+
+                                                    if (tasksCompleted > tasksAssigned) {
+                                                        event.preventDefault(); // Prevent form submission
+                                                        alert('The number of tasks completed must be less than or equal to the number of tasks assigned.'); // Show error message
+                                                    }
+                                                });
+                                            </script>
+
+                                        </form>
 
                                     </div>
                                 </div>

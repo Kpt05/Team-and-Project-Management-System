@@ -1,56 +1,70 @@
 <!--Created by Kevin Titus on 2022-07-19.-->
 <!-- PHP intergration -->
 <?php
-// Including functions.inc.php to use functions and dbconfig.php to connect to the database
-require_once('includes/functions.inc.php');
+// This will start the session and get the employee number, first name, last name, and account type. This is used to display the name of the user on the navbar and to determine which sidebar to display
+// Ultimately, this decide which navbar and sidebar to display basec on the account type
+session_start();
+
+require_once('includes/functions.inc.php'); // Including functions.inc.php to use functions and dbconfig.php to connect to the database
 $conn = require 'includes/dbconfig.php';
 
-// Start session
-session_start();
+require_once 'includes/authentication.inc.php'; // Include the authentication.php file
 $empNo = $_SESSION['empNo'];
 $firstName = getFirstName($conn, $empNo);
 $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
 
-// Count number of admins
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
+
+
+// This will count the number of adminsitraive users in the database, this is used to retireve the number of admins, managers, and employees for the pie chart which shows the breakdown of users
 $sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Administrator'"; // SQL query to count number of admins
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $admin_count = $row['count'];
 
-// Count number of managers
+// Count number of managers in the database whcih is used to display the number of managers in the pie chart
 $sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Manager'"; // Query to count number of managers
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $manager_count = $row['count'];
 
-// Count number of employees
+// Count number of employees in the database which is used to display the number of employees in the pie chart
 $sql = "SELECT COUNT(*) as count FROM Users WHERE accountType='Employee'"; // Query to count number of employees
 $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 $employee_count = $row['count'];
 
+// Total number of users in the database which is used to display the total number of users in the pie chart
 $total_users = $admin_count + $manager_count + $employee_count; // Total number of users
+// THOU THE VARIABLES ABOVE DO NOT DIRECTLY DISPLAY THE NUMBER OF USERS, THEY ARE USED TO CALCULATE THE PERCENTAGE OF USERS IN EACH CATEGORY FOR THE PIE CHART
+// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
-
-// Query the database to retrieve data for the chart
+// Query the database to retrieve data for the chart which shows the efficiency rate of each user, this is used to display the efficiency rate of each user in the bar chart
 $sql = "SELECT r.userID, u.firstName, u.lastName, r.tasksCompleted, r.tasksAssigned, r.hoursWorked FROM Reports r
         INNER JOIN Users u ON r.userID = u.userID"; // Join with Users table to get full names
 $result = $conn->query($sql);
 
-// Create a 3D array to store the chart data
-$chartData = array();
-while ($row = $result->fetch_assoc()) {
-    $efficiencyRate = ($row["tasksCompleted"] / $row["hoursWorked"]) * 100;
+// Create a 3D array to store the chart data which will be used to display the efficiency rate of each user in the bar chart on the dashboard
+$chartData = array(); // 3D array to store the chart data
+while ($row = $result->fetch_assoc()) { // Loop through each row in the result set
+    $efficiencyRate = ($row["tasksCompleted"] / $row["hoursWorked"]) * 100; // Calculate efficiency rate
     $fullName = $row["firstName"] . " " . $row["lastName"]; // Concatenate first name and last name
     $chartData[] = array(
         "userID" => $fullName, // Use full name as label on x-axis
-        "efficiencyRate" => $efficiencyRate
+        "efficiencyRate" => $efficiencyRate // Use efficiency rate as value on y-axis
     );
 }
 
 // Bubble sort to sort the chart data in ascending order based on efficiency rate
+// This is used to display the users in the bar chart in ascending order based on efficiency rate
 for ($i = 0; $i < count($chartData) - 1; $i++) {
     for ($j = 0; $j < count($chartData) - $i - 1; $j++) {
         if ($chartData[$j]["efficiencyRate"] > $chartData[$j + 1]["efficiencyRate"]) {
@@ -68,19 +82,19 @@ for ($i = 0; $i < count($chartData) - 1; $i++) {
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /> <!-- This is used to make the page responsive by scaling the page to the width of the device -->
     <title>My Dashboard | Source Tech Portal</title> <!-- Page title -->
     <!-- plugins:css -->
-    <link rel="stylesheet" href="vendors/feather/feather.css" />
-    <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" />
-    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="vendors/feather/feather.css" /> <!-- Feather icons whcih are used in the sidebar -->
+    <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" /> <!-- Themify icons which are used in the sidebar -->
+    <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css" /> <!-- Base CSS for the page -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css"> <!-- Bootstrap icons which are used in the sidebar -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js which is used to display the pie chart and bar chart -->
 
     <!-- Plugin css for this page -->
-    <link rel="stylesheet" href="vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
-    <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" />
-    <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css" />
+    <link rel="stylesheet" href="vendors/datatables.net-bs4/dataTables.bootstrap4.css" /> <!-- CSS for the data tables which are used to display the users in the table -->
+    <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" /> <!-- Themify icons which are used in the sidebar -->
+    <link rel="stylesheet" type="text/css" href="js/select.dataTables.min.css" /> <!-- CSS for the data tables which are used to display the users in the table -->
     <!-- End plugin css for this page -->
 
     <link rel="stylesheet" href="css/vertical-layout-light/style.css" />
@@ -135,6 +149,7 @@ for ($i = 0; $i < count($chartData) - 1; $i++) {
 
 
             <!-- partial - Account Type Based Navbar -->
+            <!-- This will use the sidebar partial based on the account type in the session variable of the user and include it on the dasboard.php page -->
             <?php
             if ($accountType == 'Employee') {
                 include 'includes/_employeesidebar.php';
@@ -177,7 +192,7 @@ for ($i = 0; $i < count($chartData) - 1; $i++) {
                                             </div>
                                             <div class="ml-2">
                                                 <h4 class="location font-weight-normal">Source Tech HQ</h4>
-                                                <h6 class="font-weight-normal">Yeovil - United Kingdom</h6>
+                                                <h6 class="font-weight-normal">Yeovil - United Kingdom</h6> <!-- Displays the location of the Source Tech HQ (Where the system will be used primarily) -->
                                             </div>
                                         </div>
                                     </div>
@@ -187,16 +202,16 @@ for ($i = 0; $i < count($chartData) - 1; $i++) {
 
                         <!-- OpenWeatherMap API -->
                         <script>
-                            const apiKey = "6abe60b89e524acc551948f8a204b452"; // API Key
-                            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Yeovil,uk&units=metric&appid=${apiKey}`;
+                            const apiKey = "6abe60b89e524acc551948f8a204b452"; // API Key which is used to access the data from the API (This technically shouldn't be here but it's a free API so it's fine)
+                            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=Yeovil,uk&units=metric&appid=${apiKey}`; // API URL which is used to access the data from the API
 
-                            fetch(apiUrl)
-                                .then(response => response.json())
-                                .then(data => {
-                                    const tempElement = document.getElementById("temp");
-                                    tempElement.textContent = Math.round(data.main.temp); // Displays the current temperature in Yeovil
+                            fetch(apiUrl) // Fetches the data from the API URL using the API Key to access the data for the system
+                                .then(response => response.json()) // Converts the response to JSON which can be used by the system to display the data
+                                .then(data => { 
+                                    const tempElement = document.getElementById("temp"); 
+                                    tempElement.textContent = Math.round(data.main.temp); // Displays the current temperature in Yeovil, this is becuase the HQ of Source Tech is in Yeovil and the system is intended to be used there
                                 })
-                                .catch(error => console.log(error));
+                                .catch(error => console.log(error)); // Displays any errors in the console through the browser using error trapping
                         </script>
 
                         <div class="col-md-6 grid-margin stretch-card">
@@ -206,18 +221,21 @@ for ($i = 0; $i < count($chartData) - 1; $i++) {
                                         <div class="col-md-6">
                                             <canvas id="myPieChart"></canvas>
                                         </div>
+
                                         <div class="col-md-6">
+                                            <!-- Displays the number of active user accounts -->
                                             <div class="chart-legend">
                                                 <h4 style="font-size: 24px; margin-bottom: 30px;">Active User Accounts</h4> <!-- Displays the number of active user accounts -->
                                                 <?php
+                                                // As declared at the top of the page, this will display the number of active user accounts and the percentage of each account type from the database and display it on the dashboard
                                                 $user_types = array(
-                                                    'Admins' => $admin_count,
-                                                    'Managers' => $manager_count,
-                                                    'Employees' => $employee_count
+                                                    'Admins' => $admin_count, // Uses the variables declared at the top of the page to display the number of active user accounts
+                                                    'Managers' => $manager_count, // Uses the variables declared at the top of the page to display the number of active user accounts
+                                                    'Employees' => $employee_count // Uses the variables declared at the top of the page to display the number of active user accounts
                                                 );
 
                                                 // Calculate the total number of users
-                                                $total_users = array_sum($user_types);
+                                                $total_users = array_sum($user_types); // Uses the array_sum function to add all the values in the array together to get the total number of users
                                                 foreach ($user_types as $user_type => $count) {
                                                     $percent = round($count / $total_users * 100, 2);
                                                     echo "<p style='font-size: 20px; margin-bottom: 35px;'>{$user_type}: {$count} ({$percent}%)</p>";
@@ -268,7 +286,6 @@ for ($i = 0; $i < count($chartData) - 1; $i++) {
                         </script>
                     </div>
 
-
                     <div class="row">
 
                         <div class="row">
@@ -288,9 +305,11 @@ for ($i = 0; $i < count($chartData) - 1; $i++) {
                             <div class="col-md-3 grid-margin stretch-card">
                                 <div class="card">
                                     <div class="card-body">
-                                        <h4 class="card-title">To Do Lists</h4>
+                                        <h4 class="card-title">To Do Lists</h4> <!-- Added to do list title -->
                                         <div class="list-wrapper pt-2">
                                             <ul class="d-flex flex-column-reverse todo-list todo-list-custom">
+                                                <!-- This is the to do list, it will display the tasks that need to be completed -->
+                                                <!-- However, this is only client side and does not store the data in the database, so it will not be saved when the page is refreshed -->
                                                 <li>
                                                     <div class="form-check form-check-flat">
                                                         <label class="form-check-label">
@@ -387,13 +406,7 @@ for ($i = 0; $i < count($chartData) - 1; $i++) {
                             });
                         </script>
 
-
-
-
                     </div>
-
-
-
 
                     <!-- partial:includes/_footer.php -->
                     <?php include("includes/_footer.php"); ?>
@@ -429,7 +442,7 @@ for ($i = 0; $i < count($chartData) - 1; $i++) {
 
         <!-- loader script -->
         <script>
-            var loader = document.querySelector(".loader")
+            var loader = document.querySelector(".loader") // Get the loader element
 
             window.addEventListener("load", vanish);
 

@@ -129,7 +129,7 @@ $accountType = getAccountType($conn, $empNo); // Get the account type of the emp
                                                                     <label for="teamName">
                                                                         Team Name: <span style="color: red;">*</span>
                                                                     </label>
-                                                                    <input type="text" class="form-control" id="teamName" name="teamName" required /> <!-- Team name input, which has a required attribute (Like a presence check) -->
+                                                                    <input type="text" class="form-control" id="teamName" name="teamName" maxlength="25" required /> <!-- Team name input, which has a required attribute (Like a presence check) -->
                                                                 </div>
 
                                                                 <div class="form-group">

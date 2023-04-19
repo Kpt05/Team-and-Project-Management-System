@@ -1,16 +1,26 @@
 <!--Created by Kevin Titus on 2022-07-19.-->
 <!-- PHP intergration -->
 <?php 
-require_once('../includes/functions.inc.php'); // Include the PHP functions to be used on the page
-// Make a database connection
-$conn = require '../includes/dbconfig.php'; // Connect to the database file
-
-// Start the session
+// Start the session if it hasn't already been started, using the session variable from each page, the Name of the user is displayed in the navbar
 session_start();
+require_once('../includes/functions.inc.php'); // Include the PHP functions to be used on the page 
+// Make a database connection
+$conn = require '../includes/dbconfig.php'; // Connect to the database file and store the connection in the $conn variable
+
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 $empNo = $_SESSION['empNo'];
 $firstName = getFirstName($conn, $empNo);
 $lastName = getLastName($conn, $empNo);
 $accountType = getAccountType($conn, $empNo);
+
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
 
 // If the delete button is clicked, the following will delete the project from the database
 if (isset($_POST['delete-project'])) {
@@ -21,13 +31,13 @@ if (isset($_POST['delete-project'])) {
     exit();
 }
 
-// Define the SQL query to retrieve data from the Users Table
+// Define the SQL query to retrieve data from the Users Table and execute the query, this is used for retrieving the user's name of who created the project
 $sql = "SELECT * FROM Users";
 
-// Execute the query and get the result set
+// Execute the query and get the result set (set of rows) which is stored in the $result variable for use in the HTML code below
 $result = mysqli_query($conn, $sql);
 
-$sql = "SELECT * FROM Projects";
+$sql = "SELECT * FROM Projects"; // Define the SQL query to retrieve data from the Projects Table and execute the query, this is used for retrieving the project information, which is displayed in the table
 $result = mysqli_query($conn, $sql);
 
 ?>
@@ -39,7 +49,7 @@ $result = mysqli_query($conn, $sql);
     <!-- Required meta tags -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>View Projects | Source Tech Portal</title>
+    <title>View Projects | Source Tech Portal</title> <!-- Title of the page -->
     <!-- plugins:css -->
     <link rel="stylesheet" href="../vendors/feather/feather.css" />
     <link rel="stylesheet" href="../vendors/ti-icons/css/themify-icons.css" />
@@ -226,6 +236,10 @@ $result = mysqli_query($conn, $sql);
                                 <div class="card-body"> <!-- Main panel card body -->
                                     <!-- Team Cards -->
                                     <?php
+                                    // Retrieve all projects from Projects table and display them as team cards, ordered by project name in ascending order (A-Z)
+                                    // Variable retrieval and query execution (Projects table)
+                                    // The following loops through all projects in the Projects table and displays them as team cards.
+                                    // If none are found, a message is displayed instead.
                                     while ($row = mysqli_fetch_assoc($result)) {
                                         echo '<div class="team-card">'; // Team card
                                         echo '<div class="team-pic" style="background-image: url(' . $row["team_pic"] . ');"></div>'; // Team picture
@@ -241,9 +255,9 @@ $result = mysqli_query($conn, $sql);
                                         $projectLeadRow = mysqli_fetch_assoc($result2); // Retrieve row
                                         $projectLeadFullName = $projectLeadRow["fullName"]; // Project lead full name
                                         $projectLeadEmail = $projectLeadRow["email"]; // Project lead email
-                                        echo '<div class="team-info">Team Lead: ' . $projectLeadFullName . '</div>'; // Project lead full name
+                                        echo '<div class="team-info">Team Lead: ' . $projectLeadFullName . '</div>'; // Project lead full name which is retrieved from the Users table using the session variable
                                         // Make the email address clickable and opens the default email client
-                                        echo '<div class="team-info">Email: <a href="mailto:' . $projectLeadEmail . '">' . $projectLeadEmail . '</a></div>';
+                                        echo '<div class="team-info">Email: <a href="mailto:' . $projectLeadEmail . '">' . $projectLeadEmail . '</a></div>'; // Project lead email address which is retrieved from the Users table using the session variable
                                         echo '</div>';
                                     }
                                     ?>
@@ -307,6 +321,7 @@ $result = mysqli_query($conn, $sql);
 
     <!-- Loader -->
     <script>
+        // Loader animation when page is loading
         var loader = document.querySelector(".loader")
 
         window.addEventListener("load", vanish);
@@ -322,6 +337,7 @@ $result = mysqli_query($conn, $sql);
 <!-- Javascript to allow user to select by clicking on cards -->
 <script>
     // Get all the team cards
+    // Selecting the cards will allow the user to edit or delete the project
     const teamCards = document.querySelectorAll('.team-card');
 
     // Add event listeners to each team card

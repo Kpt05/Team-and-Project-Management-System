@@ -1,18 +1,27 @@
 <!--Created by Kevin Titus on 2022-07-21.-->
 <!-- PHP intergration -->
 <?php
+// Start a session to get the employee number from the session and use it to get the first name, last name and account type of the user
+session_start();
 require_once('../includes/functions.inc.php'); // Include the functions file
 // Make a database connection
 $conn = require '../includes/dbconfig.php'; // Include the database connection file and store the connection in a variable
 
-// Start the session
-session_start();
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 $empNo = $_SESSION['empNo']; // Get the employee number from the session
 $firstName = getFirstName($conn, $empNo); // Get the first name from the database
 $userID = getUserId($conn, $empNo); // Get the user ID from the database
 $lastName = getLastName($conn, $empNo); // Get the last name from the database
 $accountType = getAccountType($conn, $empNo); // Get the account type from the database
 
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
 
 // Find the corresponding UserID for the empNo
 $query = "SELECT UserID FROM Users WHERE empNo = ?"; // Query to find the UserID

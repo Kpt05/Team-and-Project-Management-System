@@ -20,6 +20,13 @@ class User
  */
 function authenticate($conn)
 {
+    // Check if the user is logged in.
+    if (!isset($_SESSION['empNo'])) {
+        // The user is not logged in.
+        header("Location: ../index.php?error=notloggedin");
+        exit();
+    }
+
     // Get the user object for the current user.
     $user = getUser($conn, $_SESSION['email']);
 

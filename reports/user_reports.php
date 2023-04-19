@@ -1,20 +1,31 @@
 <!-- PHP intergration -->
 <?php
+// Start session
+session_start();
 // Including functions.inc.php to use functions and dbconfig.php to connect to the database
 require_once('../includes/functions.inc.php'); // All the necessary functions are in this file
 $conn = require '../includes/dbconfig.php'; // Database connection, returns $conn
 
-// Start session
-session_start();
+
+require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 $empNo = $_SESSION['empNo']; // Get the employee number from the session
 $firstName = getFirstName($conn, $empNo); // Get the first name of the user
 $lastName = getLastName($conn, $empNo); // Get the last name of the user
 $accountType = getAccountType($conn, $empNo); // Get the account type of the user
 
+// Authenticate the user
+$isAuthenticated = authenticate($conn);
+
+if (!$isAuthenticated) {
+    // If not authenticated, redirect to the login page
+    header("Location: ../index.php?error=notloggedin");
+    exit();
+}
+
 // Fetch data from the Reports table
 $sql = "SELECT r.tasksCompleted, r.tasksAssigned, r.hoursWorked, r.userID, u.firstName, u.lastName, u.teams
-        FROM Reports r 
-        JOIN Users u ON r.userID = u.UserID";
+FROM Reports r
+JOIN Users u ON r.tasksCompleted = u.UserID";
 $result = mysqli_query($conn, $sql); // Execute the query
 
 // Initialize arrays to store team data
@@ -31,7 +42,7 @@ while ($row = mysqli_fetch_assoc($result)) { // Fetch a result row as an associa
     $userID = $row['userID']; // Get the user ID
     $firstName = $row['firstName']; // Get the first name
     $lastName = $row['lastName']; // Get the last name
-    $teamID = $row['teams']; // Get the team ID
+    $teamID = $row['teams']; // Get the team ID 
 
     // Calculate performance metrics
     $completionRate = ($tasksCompleted / $tasksAssigned) * 100; // Calculate completion rate
