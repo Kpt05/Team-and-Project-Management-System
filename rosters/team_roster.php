@@ -218,34 +218,34 @@ if (!$isAuthenticated) {
 
                                                     $startDate = new DateTime('first day of this month');
                                                     $endDate = new DateTime('last day of this month');
-
+                                
                                                     while ($startDate <= $endDate) {
                                                         echo "<tr>";
                                                         for ($i = 0; $i < 7; $i++) {
                                                             echo "<td class='roster-calendar-day' style='height: 70px; width: 100px;'>";
                                                             $currentDate = $startDate->format('Y-m-d');
-
+                                
                                                             if ($startDate->format('m') == date('m')) {
-                                                                echo "<div class='roster-calendar-day-number' style='position: relative; top: -30px; left: -17px;'>" . $startDate->format('j') . "</div>";
-
-                                                                echo "<div class='roster-entry-container' style='max-height: 40px; overflow-y: auto;'>";
-
+                                                                echo "<div class='roster-calendar-day-number'>" . $startDate->format('j') . "</div>";
+                                
+                                                                echo "<div class='roster-entry-container' style='max-height: 40px; overflow-y: auto; margin-top: 10px;'>";
+                                
                                                                 foreach ($userData as $entry) {
                                                                     $entryDate = new DateTime($entry['shiftDate']);
                                                                     $calendarDate = new DateTime($currentDate);
-
+                                
                                                                     if ($entryDate->format('Y-m-d') == $calendarDate->format('Y-m-d')) {
                                                                         $fullName = $entry['firstName'] . " " . $entry['lastName'];
                                                                         $attendanceCode = $entry['attendanceCode'];
                                                                         echo "<div class='roster-entry' style='width: 90px; word-break: break-all;'>{$fullName} - {$attendanceCode}</div>";
                                                                     }
                                                                 }
-
+                                
                                                                 echo "</div>";
                                                             }
-
+                                
                                                             echo "</td>";
-
+                                
                                                             if ($startDate->format('m') == date('m')) {
                                                                 $startDate->add(new DateInterval('P1D'));
                                                             } else {
