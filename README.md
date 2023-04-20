@@ -58,4 +58,5 @@ If you need any assistance with the system or have any questions, please contact
 
 ## Conclusion
 
-I hope that you find this system useful for team management, project tracking, and attendance monitoring needs. If you have any feedback or suggestions for improving the system, please let me know. We are committed to providing the best possible solution for our clients and partners.
+I hope that you find this project to be a useful and effective solution for team management, project tracking, and attendance monitoring.
+Thank you for taking the time to review my project.
