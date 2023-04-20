@@ -1,6 +1,10 @@
 <!--Created by Kevin Titus on 2022-07-21.-->
 <!-- PHP intergration -->
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Start the session
 session_start();
 require_once('../includes/functions.inc.php'); // Include the functions file
@@ -8,9 +12,11 @@ $conn = require '../includes/dbconfig.php'; // Include the database connection f
 
 require_once '../includes/authentication.inc.php'; // Include the authentication.php file
 $empNo = $_SESSION['empNo']; // Get the empNo from the session
+$userId = getUserID($conn, $empNo); // Get the userId using the empNo
 $firstName = getFirstName($conn, $empNo); // Get the first name from the database
 $lastName = getLastName($conn, $empNo); // Get the last name from the database
 $accountType = getAccountType($conn, $empNo); // Get the account type from the database
+$teamID = getTeamID($conn, $userId); // Get the team ID from the database
 
 // Authenticate the user
 $isAuthenticated = authenticate($conn);
@@ -139,7 +145,7 @@ if (!$isAuthenticated) {
 
         <div class="container-fluid page-body-wrapper">
 
-              <!-- partial - Account Type Based Navbar -->
+            <!-- partial - Account Type Based Navbar -->
             <!-- This will use the sidebar partial based on the account type in the session variable of the user and include it on the dasboard.php page -->
             <?php
             if ($accountType == 'Employee') {
@@ -150,7 +156,7 @@ if (!$isAuthenticated) {
                 include '../includes/_adminsidebar.php';
             }
             ?>
-            
+
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
@@ -162,18 +168,17 @@ if (!$isAuthenticated) {
                                     <h2 class="font-weight-bold">Team Roster</h2> <!-- Page title -->
                                     <?php
                                     // Display the current month and year
-                                    echo "<h4>" . date('F Y') . "</h4>"; 
+                                    echo "<h4>" . date('F Y') . "</h4>";
                                     ?>
                                 </div>
                                 <div class="row"></div>
-                                <div class="col-lg-12 grid-margin stretch-card"> <!-- Table card -->
+
+                                <div class="col-lg-12 grid-margin stretch-card">
                                     <div class="card">
                                         <div class="card-body">
-                                            <!-- Team Roster calendar table -->
-                                            <table class="table table-bordered roster-calendar" style="height: 500px;"> <!-- Table Size -->
+                                            <table class="table table-bordered roster-calendar" style="height: 500px;">
                                                 <thead>
                                                     <tr>
-                                                        <!-- Roster Calendar Headers (Each day of the week) -->
                                                         <th class="roster-calendar-day">Sun</th>
                                                         <th class="roster-calendar-day">Mon</th>
                                                         <th class="roster-calendar-day">Tue</th>
@@ -185,55 +190,69 @@ if (!$isAuthenticated) {
                                                 </thead>
                                                 <tbody>
                                                     <?php
-                                                    // Query the Roster table to get the user data
-                                                    $sql = "SELECT userName, attendanceCode, shiftDate FROM Roster"; // SQL query
-                                                    $result = mysqli_query($conn, $sql); // Execute the query
+
+                                                    // Query the Roster and Users table to get the user data
+                                                    $sql = "SELECT u.firstName, u.lastName, r.attendanceCode, r.shiftDate FROM Roster r
+                                                     JOIN Users u ON r.userID = u.UserID
+                                                     WHERE u.teams = (SELECT teams FROM Users WHERE UserID = ?)";
+
+                                                    $stmt = $conn->prepare($sql);
+                                                    $stmt->bind_param("i", $userId);
+                                                    $stmt->execute();
+                                                    $result = $stmt->get_result();
 
                                                     $userData = []; // Array to store the user data
 
-                                                    if (mysqli_num_rows($result) > 0) {
+                                                    if ($result->num_rows > 0) {
                                                         // Loop through the query results and add them to the $userData array
-                                                        while ($row = mysqli_fetch_assoc($result)) {
+                                                        while ($row = $result->fetch_assoc()) {
                                                             $userData[] = $row;
                                                         }
+                                                    } else {
+                                                        echo "Error: " . $stmt->error;
                                                     }
 
-                                                    mysqli_close($conn); // Close the database connection
 
-                                                    $startDate = new DateTime('first day of this month'); // Get the first day of the current month
-                                                    $endDate = new DateTime('last day of this month'); // Get the last day of the current month
+                                                    $stmt->close(); // Close the prepared statement
+                                                    $conn->close(); // Close the database connection
 
-                                                    while ($startDate <= $endDate) { // Loop through the days of the current month
+                                                    $startDate = new DateTime('first day of this month');
+                                                    $endDate = new DateTime('last day of this month');
+
+                                                    while ($startDate <= $endDate) {
                                                         echo "<tr>";
-                                                        for ($i = 0; $i < 7; $i++) { // Loop through the days of the week
-                                                            echo "<td class='roster-calendar-day' style='height: 70px; width: 100px;'>"; // Set the height and width of the table cells
-                                                            $currentDate = $startDate->format('Y-m-d'); // Get the current date
+                                                        for ($i = 0; $i < 7; $i++) {
+                                                            echo "<td class='roster-calendar-day' style='height: 70px; width: 100px;'>";
+                                                            $currentDate = $startDate->format('Y-m-d');
 
-                                                            if ($startDate->format('m') == date('m')) { // Check if the current date is in the current month
-                                                                echo "<div class='roster-calendar-day-number' style='position: relative; top: -30px; left: -17px;'>" . $startDate->format('j') . "</div>"; // Display the day number
+                                                            if ($startDate->format('m') == date('m')) {
+                                                                echo "<div class='roster-calendar-day-number' style='position: relative; top: -30px; left: -17px;'>" . $startDate->format('j') . "</div>";
 
-                                                                // Create a container with a fixed height and overflow set to auto
                                                                 echo "<div class='roster-entry-container' style='max-height: 40px; overflow-y: auto;'>";
 
-                                                                // Loop through the user data and display matching entries for the current date
-                                                                foreach ($userData as $entry) { // Loop through the user data
-                                                                    if ($entry['shiftDate'] == $currentDate) { // Check if the current date matches the shift date
-                                                                        // Add a fixed width and word-break to the roster-entry div
-                                                                        echo "<div class='roster-entry' style='width: 90px; word-break: break-all;'>{$entry['userName']} - {$entry['attendanceCode']}</div>";
+                                                                foreach ($userData as $entry) {
+                                                                    $entryDate = new DateTime($entry['shiftDate']);
+                                                                    $calendarDate = new DateTime($currentDate);
+
+                                                                    if ($entryDate->format('Y-m-d') == $calendarDate->format('Y-m-d')) {
+                                                                        $fullName = $entry['firstName'] . " " . $entry['lastName'];
+                                                                        $attendanceCode = $entry['attendanceCode'];
+                                                                        echo "<div class='roster-entry' style='width: 90px; word-break: break-all;'>{$fullName} - {$attendanceCode}</div>";
                                                                     }
                                                                 }
 
-                                                                echo "</div>"; // Close the roster-entry-container div
+                                                                echo "</div>";
                                                             }
 
-                                                            echo "</td>"; // Close the table cell
-                                                            if ($startDate->format('m') == date('m')) { // Check if the current date is in the current month
-                                                                $startDate->add(new DateInterval('P1D')); // Add one day to the current date
+                                                            echo "</td>";
+
+                                                            if ($startDate->format('m') == date('m')) {
+                                                                $startDate->add(new DateInterval('P1D'));
                                                             } else {
-                                                                break; // Break out of the loop
+                                                                break;
                                                             }
                                                         }
-                                                        echo "</tr>"; // Close the table row
+                                                        echo "</tr>";
                                                     }
                                                     ?>
                                                 </tbody>
@@ -329,7 +348,7 @@ if (!$isAuthenticated) {
                 <!-- End custom js for this page-->
 
                 <script>
-                // Loader Script
+                    // Loader Script
                     var loader = document.querySelector(".loader")
 
                     window.addEventListener("load", vanish);
@@ -340,4 +359,5 @@ if (!$isAuthenticated) {
                 </script>
 
 </body>
+
 </html>

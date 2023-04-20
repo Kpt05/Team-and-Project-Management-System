@@ -541,6 +541,28 @@ function getUserID($conn, $empNo) { // The connection to the database is passed 
     return $row['UserID']; // The user ID is returned.
 }
 
+
+function getTeamID($conn, $userId) {
+    $sql = "SELECT teams FROM Users WHERE UserID = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        return $row['teams'];
+    }
+    return null;
+}
+
+
+
+
+
+
+
+
+
 // Thsi function is used on the Reports page to retrieve the reports data.
 function getReportsData($conn, $userID) { // The connection to the database is passed through the function, and the user ID is passed through the function. This means the report data is specific to the logged in user.
     $sql = "SELECT reportID, tasksCompleted, tasksAssigned, hoursWorked FROM Reports WHERE userID = ?"; // The SQL statement is created. This is used to select the report ID, tasks completed, tasks assigned and hours worked from the reports table in the database.

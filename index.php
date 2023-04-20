@@ -129,7 +129,7 @@
                                     <div class="form-group mb-3">
                                         <label class="label" for="Password">Password</label> <!-- Password label -->
                                         <div class="position-relative">
-                                            <input type="password" class="form-control pr-5" placeholder="Password" required name="password" id="password" maxlength="100" minlength="5" /> <!-- Password input with length checks -->
+                                            <input type="password" class="form-control pr-5" placeholder="Password" required name="password" id="password" maxlength="100" minlength="2" /> <!-- Password input with length checks -->
                                             <span class="position-absolute top-50 translate-middle-y" style="right: 15px; top: 10px;" id="password-toggle">
                                                 <i class="fa fa-eye"></i>
                                             </span>
