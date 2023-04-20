@@ -33,23 +33,29 @@ The system provides a wide range of features for team management, project tracki
 
 - User authentication and authorization
 - Team management
-- Project tracking and management
-- Attendance monitoring
-- Reporting and analytics
-- Customizable settings and configurations
+- System User management
+- Project management
+- Attendance monitoring (Rosters)
+- Reporting 
+- Hour clocking
 
 ## Technology Stack
 
 The system is developed using the latest web technologies and follows best practices for software development. The key technologies used in the development of the system include:
 
-- Front-end: React, Redux, Material-UI
-- Back-end: Node.js, Express.js, MongoDB
-- Authentication: JSON Web Tokens (JWT)
+- Front-end: HTML, CSS, JavaScript, AJAX, JSON
+- Back-end: PHP (Version 7.4.33), SQL
+- Database: MySQL
+- Web Server: MAMP
+- Database Management: PHPMyAdmin
 
 ## Getting Help
 
-If you need any assistance with the system or have any questions, please contact your project supervisor, Mr Rhys Garman, or the development team at Source Tech LTD.
+If you need any assistance with the system or have any questions, please contact the examination centre of the solution developer
+- Candidate Number: 9484
+- Candidate Name: Kevin Titus
+- Centre Number: 68742
 
 ## Conclusion
 
-We hope that you find this system useful for your team management, project tracking, and attendance monitoring needs. If you have any feedback or suggestions for improving the system, please let us know. We are committed to providing the best possible solution for our clients and partners.
+I hope that you find this system useful for team management, project tracking, and attendance monitoring needs. If you have any feedback or suggestions for improving the system, please let me know. We are committed to providing the best possible solution for our clients and partners.
