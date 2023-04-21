@@ -10,6 +10,16 @@ In order to run the application locally, you will need to start a localhost serv
 
 Once the server is running, open your browser and navigate to `localhost` with the specified port number (e.g., `http://localhost:8888`). You should see the login page for the application.
 
+### Importing the Database
+
+After starting the server, you will need to import the provided `Source_Tech.sql` database file into your PHPMyAdmin.
+
+1. Open PHPMyAdmin in your browser (e.g., `http://localhost:8888/phpmyadmin`).
+2. Create a new database with the name `Source_Tech`.
+3. Select the `Source_Tech` database, and then click on the `Import` tab.
+4. Click on the `Choose File` button, and select the `Source_Tech.sql` file from your project folder.
+5. Click on the `Go` button to start the import process. Once the import is complete, the database will be set up and ready for use with the application.
+
 To access the system, you will need to use the login credentials provided to you. There are three types of accounts that can be used to access the system:
 
 ### **Admin Account**
