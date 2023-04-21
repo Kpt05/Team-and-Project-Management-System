@@ -4,6 +4,12 @@ This is a web-based application developed for Source Tech LTD in partnership wit
 
 ## Getting Started
 
+### Starting the Localhost Server
+
+In order to run the application locally, you will need to start a localhost server. You can use a web server like MAMP, WAMP, or XAMPP, depending on your operating system. Follow the instructions for your chosen web server to start the localhost server.
+
+Once the server is running, open your browser and navigate to `localhost` with the specified port number (e.g., `http://localhost:8888`). You should see the login page for the application.
+
 To access the system, you will need to use the login credentials provided to you. There are three types of accounts that can be used to access the system:
 
 ### **Admin Account**
