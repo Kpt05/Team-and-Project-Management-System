@@ -20,6 +20,12 @@ After starting the server, you will need to import the provided `Source_Tech.sql
 4. Click on the `Choose File` button, and select the `Source_Tech.sql` file from your project folder.
 5. Click on the `Go` button to start the import process. Once the import is complete, the database will be set up and ready for use with the application.
 
+### Opening the Application in the Browser
+
+After importing the database, open your browser and navigate to `localhost` with the specified port number (e.g., `http://localhost:8888`). This should open the `index.php` file of the application, displaying the login page.
+
+If the `index.php` file does not load automatically, you can enter it manually in the URL (e.g., `http://localhost:8888/index.php`).
+
 To access the system, you will need to use the login credentials provided to you. There are three types of accounts that can be used to access the system:
 
 ### **Admin Account**
