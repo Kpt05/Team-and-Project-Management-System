@@ -73,10 +73,7 @@ The system is developed using the latest web technologies and follows best pract
 
 ## Getting Help
 
-If you need any assistance with the system or have any questions, please contact the examination centre of the solution developer
-- Candidate Number: 9484
-- Candidate Name: Kevin Titus
-- Centre Number: 68742
+If you need any assistance with the system or have any questions, please contact me @ hello@titusk.me
 
 ## Conclusion
 
