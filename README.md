@@ -73,7 +73,7 @@ The system is developed using the latest web technologies and follows best pract
 
 ## Getting Help
 
-If you need any assistance with the system or have any questions, please contact me @ hello@titusk.me
+If you need any assistance with the system or have any questions, please contact me hello@titusk.me
 
 ## Conclusion
 
