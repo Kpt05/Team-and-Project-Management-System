@@ -1,5 +1,3 @@
-# Untitled
-
 ![Screenshot 2023-11-01 at 19.28.29.png](Screenshot_2023-11-01_at_19.28.29.png)
 
 # Source Tech LTD: Team, Project, and Attendance System
